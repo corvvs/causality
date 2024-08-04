@@ -21,26 +21,29 @@ export const GraphView = () => {
 
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [draggingNode, setDraggingNode] = useState<GraphNode | null>(null);
-  const draggingOrigin = useRef<{
-    node: Vector;
-    screen: Vector;
-  } | null>(null);
+  const [draggingOrigin, setDraggingOrigin] = useState<Vector | null>(null);
+
+
+  const cursor = draggingNode ? { cursor: "grab" } : {};
+  const style = {
+    ...cursor,
+  };
 
   useEffect(() => {
 
     const handleMouseMove = (event: any) => {
       if (!draggingNode) { return; }
-      if (!draggingOrigin.current) { return; }
+      if (!draggingOrigin) { return; }
       const n = graph.nodes.find(node => node.id === draggingNode.id);
       if (!n) { return; }
-      const xTo = event.clientX - draggingOrigin.current.node.x
-      const yTo = event.clientY - draggingOrigin.current.node.y
+      const xTo = event.clientX - draggingOrigin.x
+      const yTo = event.clientY - draggingOrigin.y
       const positionTo = { x: xTo, y: yTo };
       updateNode(n.id, { position: positionTo });
     };
     const handleMouseUp = () => {
       setDraggingNode(null);
-      draggingOrigin.current = null;
+      setDraggingOrigin(null);
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -52,7 +55,7 @@ export const GraphView = () => {
     };
   });
 
-  return <div className="h-screen w-screen flex flex-col">
+  return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">
       <svg className="svg-master h-full w-full border-2 border-red-600" ref={svgRef}>
         {
@@ -60,13 +63,10 @@ export const GraphView = () => {
             key={node.id} node={node}
             mouseDown={(e, node) => {
               if (draggingNode) { return; }
-              console.log("setDraggingNode", node);
               setDraggingNode(node);
-              draggingOrigin.current = {
-                node: { x: e.clientX - node.position.x, y: e.clientY - node.position.y },
-                screen: { x: e.screenX, y: e.screenY },
-              };
-              // setDraggingNode(node);
+              setDraggingOrigin({
+                x: e.clientX - node.position.x, y: e.clientY - node.position.y,
+              });
             }}
           />)
         }

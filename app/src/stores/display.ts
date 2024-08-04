@@ -14,13 +14,13 @@ const displayAtom = atom<CausalDisplay>(displayProvider.load(displayKey) ?? {
 export const useDisplay = () => {
   const [ display, setDisplay ] = useAtom(displayAtom);
 
-  const moveOrigin = (dx: number, dy: number) => {
+  const moveOrigin = (x: number, y: number) => {
     setDisplay((prev) => {
       return {
         ...prev,
         origin: {
-          x: prev.origin.x + dx,
-          y: prev.origin.y + dy,
+          x,
+          y,
         },
       };
     });

@@ -566,6 +566,10 @@ video {
   right: 0px;
 }
 
+.left-0 {
+  left: 0px;
+}
+
 .m-4 {
   margin: 1rem;
 }
@@ -622,6 +626,10 @@ video {
 
 .justify-center {
   justify-content: center;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .border-2 {

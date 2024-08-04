@@ -34,7 +34,6 @@ const SvgNodeRectangleShape: ComponentWithProps<{ node: RectangleNode } & Dragga
   const basePosition = node.position;
   const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;
   const baseTransform = `${baseTranslation}`;
-  console.log("baseTransform:", baseTransform);
 
   return <g
     style={{
@@ -49,21 +48,9 @@ const SvgNodeRectangleShape: ComponentWithProps<{ node: RectangleNode } & Dragga
       stroke="white"
       strokeWidth={node.shape.line.lineWidth}
       onMouseDown={(e) => {
-        // console.log("onMouseDown:", e);
         if (props.mouseDown) {
           props.mouseDown(e, node);
-        }
-      }}
-      onMouseUp={(e) => {
-        // console.log("onMouseUp:", e);
-        if (props.mouseUp) {
-          props.mouseUp(e, node);
-        }
-      }}
-      onMouseMove={(e) => {
-        // console.log("onMouseMove:", e);
-        if (props.mouseMove) {
-          props.mouseMove(e, node);
+          e.stopPropagation();
         }
       }}
     />

@@ -1,13 +1,7 @@
 import { sprintf } from "sprintf-js";
 import { GraphNode, RectangleNode } from "../../types";
+import { ComponentWithProps, DraggableProps } from "../../types/components";
 
-type HTMLProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-type ComponentWithProps<T extends object> = React.FC<T & HTMLProps>;
-type DraggableProps = {
-  mouseDown?: (e: React.MouseEvent<SVGElement>, node: GraphNode) => void;
-  mouseUp?: (e: React.MouseEvent<SVGElement>, node: GraphNode) => void;
-  mouseMove?: (e: React.MouseEvent<SVGElement>, node: GraphNode) => void;
-};
 
 const SvgNodeInnterText: ComponentWithProps<{ node: RectangleNode }> = (props) => {
   const { node } = props;

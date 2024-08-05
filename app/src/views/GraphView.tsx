@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
 import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../types";
-import { SvgNodeShape } from "../components/graph/SvgNodeShape";
 import { sprintf } from "sprintf-js";
 import { useOnPinch } from "../hooks/events";
+import { ComponentWithProps } from "../types/components";
+import { NodeGroup, QuadrandCross } from "./GraphView/components";
 
 
 type DraggingTarget = "node" | "field" | null;
@@ -34,46 +35,42 @@ const SystemView = (props: {
       draggingTarget: {props.draggingTarget || "none"}
     </p>
   </div>
-
 };
 
-const QuadrandCross = () => {
+const ScaleView: ComponentWithProps<{ getCenter: () => Vector | null }> = ({
+  getCenter
+}) => {
   const {
     display,
-  } = useDisplay(); const quadrantTranslation = `translate(${display.origin.x}px, ${display.origin.y}px)`;
-  return <g
-    style={{
-      transform: quadrantTranslation,
-    }}
-  >
-    <line
-      x1={-100000} y1={0} x2={100000} y2={0}
-      stroke="white"
-    />
-    <line
-      x1={0} y1={-100000} x2={0} y2={100000}
-      stroke="white"
-    />
-  </g>
+    scale,
+    changeScale,
+    scaleMin,
+    scaleMax,
+  } = useDisplay();
+
+  return <div className="border-2 border-green-500">
+    <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
+      const center = getCenter();
+      if (!center) { return; }
+      changeScale(parseFloat(e.target.value), center);
+      e.stopPropagation();
+    }} />
+    <p>{Math.floor(scale * 100 + 0.5)}%</p>
+  </div>
 
 };
-
 
 export const GraphView = () => {
   const {
     newNode,
     updateNode,
-    deleteNode,
     graph,
   } = useGraph();
   const {
     display,
     scale,
-    transformFieldToBrowser,
     moveOrigin,
     changeScale,
-    scaleMin,
-    scaleMax,
   } = useDisplay();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -155,41 +152,31 @@ export const GraphView = () => {
       >
 
         <QuadrandCross />
-        <g
-          style={{
-            transform: transformFieldToBrowser,
+
+        <NodeGroup
+          mouseDown={(e, node) => {
+            if (draggingNode) { return; }
+            setDraggingTarget("node");
+            setDraggingNode(node);
+            setDraggingOrigin({
+              x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale,
+            });
           }}
-        >
-          {
-            graph.nodes.map(node => <SvgNodeShape
-              key={node.id} node={node}
-              mouseDown={(e, node) => {
-                if (draggingNode) { return; }
-                setDraggingTarget("node");
-                setDraggingNode(node);
-                setDraggingOrigin({
-                  x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale,
-                });
-              }}
-            />)
-          }
-        </g>
+        />
       </svg>
     </div>
 
     <div className="absolute flex flex-row gap-4 right-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
-      <div className="border-2 border-green-500">
-        <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
-          if (!svgRef.current) { return; }
-          const svgRect = svgRef.current.getClientRects()[0];
-          const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-          changeScale(parseFloat(e.target.value), center);
-          e.stopPropagation();
-        }} />
-        <p>{Math.floor(scale * 100 + 0.5)}%</p>
-      </div>
+
+      <ScaleView getCenter={() => {
+        if (!svgRef.current) { return null; }
+        const svgRect = svgRef.current.getClientRects()[0];
+        const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+        return center;
+      }} />
+
       <div className="border-2 border-green-500">
         <button
           onClick={() => {

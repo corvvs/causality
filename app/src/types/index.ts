@@ -56,5 +56,5 @@ export type CausalGraph = {
 
 export type CausalDisplay = {
   origin: Vector;
-  scale: number;
+  magnitude: number;
 };

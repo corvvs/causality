@@ -1,3 +1,4 @@
+import { sprintf } from "sprintf-js";
 import { GraphNode, RectangleNode } from "../../types";
 
 type HTMLProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
@@ -21,7 +22,7 @@ const SvgNodeInnterText: ComponentWithProps<{ node: RectangleNode }> = (props) =
     <div
       className="w-full h-full flex flex-col justify-center items-center text-xs"
     >
-      <p>{`(x: ${node.position.x}, y: ${node.position.y})`}</p>
+      <p>{sprintf("(%1.2f, %1.2f)", node.position.x, node.position.y)}</p>
       <p>{node.id}</p>
     </div>
   </foreignObject>

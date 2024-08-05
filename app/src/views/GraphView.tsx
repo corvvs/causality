@@ -4,6 +4,7 @@ import { useDisplay } from "../stores/display";
 import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../types";
 import { SvgNodeShape } from "../components/graph/SvgNodeShape";
 import { sprintf } from "sprintf-js";
+import { useOnPinch } from "../hooks/events";
 
 
 type DraggingTarget = "node" | "field" | null;
@@ -67,6 +68,8 @@ export const GraphView = () => {
   } = useGraph();
   const {
     display,
+    scale,
+    transformFieldToBrowser,
     moveOrigin,
     changeScale,
     scaleMin,
@@ -77,9 +80,6 @@ export const GraphView = () => {
   const [draggingTarget, setDraggingTarget] = useState<DraggingTarget>(null);
   const [draggingNode, setDraggingNode] = useState<GraphNode | null>(null);
   const [draggingOrigin, setDraggingOrigin] = useState<Vector | null>(null);
-
-  const scale = Math.pow(10, display.magnitude);
-  const fieldTranslation = `translate(${display.origin.x}px, ${display.origin.y}px) scale(${scale})`;
 
   const cursor = draggingNode ? { cursor: "grab" } : {};
   const style = {
@@ -106,7 +106,6 @@ export const GraphView = () => {
         case "field": {
           const dx = event.clientX - draggingOrigin.x;
           const dy = event.clientY - draggingOrigin.y;
-          console.log("dx, dy:", dx, dy);
           moveOrigin(dx, dy);
           break;
         }
@@ -137,7 +136,16 @@ export const GraphView = () => {
     };
   });
 
-  console.log("fieldTranslation:", fieldTranslation);
+  useOnPinch({
+    onPinch: (e) => {
+      if (!svgRef.current) { return; }
+      setTimeout(() => {
+        const center: Vector = { x: e.clientX, y: e.clientY };
+        const deltaMag = e.deltaY > 0 ? -0.02 : 0.018;
+        changeScale(display.magnitude + deltaMag, center);
+      }, 0);
+    }
+  });
 
   return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">
@@ -149,7 +157,7 @@ export const GraphView = () => {
         <QuadrandCross />
         <g
           style={{
-            transform: fieldTranslation,
+            transform: transformFieldToBrowser,
           }}
         >
           {
@@ -176,13 +184,11 @@ export const GraphView = () => {
         <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
           if (!svgRef.current) { return; }
           const svgRect = svgRef.current.getClientRects()[0];
-          console.log("svgRect:", svgRect.width, svgRect.height);
           const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-          console.log(center);
           changeScale(parseFloat(e.target.value), center);
           e.stopPropagation();
         }} />
-        <p>{Math.floor(Math.pow(10, display.magnitude) * 100 + 0.5)}%</p>
+        <p>{Math.floor(scale * 100 + 0.5)}%</p>
       </div>
       <div className="border-2 border-green-500">
         <button

@@ -14,6 +14,10 @@ const displayAtom = atom<CausalDisplay>(displayProvider.load(displayKey) ?? {
 const scaleMax = +1;
 const scaleMin = -0.9;
 
+function magnitudeToScale(m: number) {
+  return Math.pow(10, m);
+}
+
 export const useDisplay = () => {
   const [ display, setDisplay ] = useAtom(displayAtom);
 
@@ -32,8 +36,8 @@ export const useDisplay = () => {
   const changeScale = (m: number, center: Vector) => {
     setDisplay((prev) => {
       const magNew = Math.max(scaleMin, Math.min(scaleMax, m));
-      const scaleNew = Math.pow(10, magNew);
-      const scaleOld = Math.pow(10, prev.magnitude);
+      const scaleNew = magnitudeToScale(magNew);
+      const scaleOld = magnitudeToScale(prev.magnitude);
 
       const origin: Vector = {
         x: (prev.origin.x - center.x) * (scaleNew/scaleOld) + center.x,
@@ -47,8 +51,12 @@ export const useDisplay = () => {
     });
   };
 
+
+  const scale = magnitudeToScale(display.magnitude);
   return {
     display,
+    scale,
+    transformFieldToBrowser: `translate(${display.origin.x}px, ${display.origin.y}px) scale(${scale})`,
     moveOrigin,
     changeScale,
     scaleMin,

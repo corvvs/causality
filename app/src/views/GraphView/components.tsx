@@ -3,10 +3,11 @@ import { useDisplay } from "../../stores/display";
 import { useGraph } from "../../stores/graph";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 
-export const QuadrandCross = () => {
+export const QuadrandOverlay = () => {
   const {
     display,
-  } = useDisplay(); const quadrantTranslation = `translate(${display.origin.x}px, ${display.origin.y}px)`;
+  } = useDisplay();
+  const quadrantTranslation = `translate(${display.origin.x}px, ${display.origin.y}px)`;
   return <g
     style={{
       transform: quadrantTranslation,
@@ -21,7 +22,6 @@ export const QuadrandCross = () => {
       stroke="white"
     />
   </g>
-
 };
 
 export const NodeGroup: ComponentWithProps<DraggableProps> = (props) => {

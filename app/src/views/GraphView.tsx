@@ -5,7 +5,8 @@ import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../types";
 import { sprintf } from "sprintf-js";
 import { useOnPinch } from "../hooks/events";
 import { ComponentWithProps } from "../types/components";
-import { NodeGroup, QuadrandCross } from "./GraphView/components";
+import { NodeGroup } from "./GraphView/components";
+import { GridOverlay } from "./GraphView/GridOverlay";
 
 
 type DraggingTarget = "node" | "field" | null;
@@ -26,7 +27,7 @@ const SystemView = (props: {
       display.origin: {`(${props.display.origin.x}, ${props.display.origin.y})`}
     </p>
     <p>
-      display.scale: {sprintf("%1.2f", scale)}
+      display.scale: {sprintf("%1.2f(%1.2f)", scale, props.display.magnitude)}
     </p>
     <p>
       draggingNode: {props.draggingNode?.id || "none"}
@@ -144,6 +145,21 @@ export const GraphView = () => {
     }
   });
 
+  const GridElement = <GridOverlay getViewRect={() => {
+    if (svgRef.current) {
+      const rect = svgRef.current.getClientRects()[0];
+      return {
+        r0: { x: rect.left, y: rect.top },
+        r1: { x: rect.left + rect.width, y: rect.top + rect.height },
+      }
+    } else {
+      return {
+        r0: { x: 0, y: 0 },
+        r1: { x: 10000, y: 10000 },
+      }
+    }
+  }} />
+
   return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">
       <svg
@@ -151,7 +167,9 @@ export const GraphView = () => {
         ref={svgRef}
       >
 
-        <QuadrandCross />
+        {/* <QuadrandOverlay /> */}
+
+        {GridElement}
 
         <NodeGroup
           mouseDown={(e, node) => {

@@ -1,6 +1,7 @@
 import { atom, useAtom } from "jotai";
 import { CausalDisplay, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
+import { affineCompose, affineInvert, affineScale, affineTranslation } from "../libs/affine";
 
 const displayKey = "DISPLAY";
 const displayProvider = localStorageProvider<CausalDisplay>();
@@ -11,8 +12,8 @@ const displayAtom = atom<CausalDisplay>(displayProvider.load(displayKey) ?? {
   magnitude: 0,
 });
 
-const scaleMax = +1;
-const scaleMin = -0.9;
+const scaleMax = +5;
+const scaleMin = -5;
 
 function magnitudeToScale(m: number) {
   return Math.pow(10, m);
@@ -51,12 +52,17 @@ export const useDisplay = () => {
     });
   };
 
-
   const scale = magnitudeToScale(display.magnitude);
+  const affineFieldToData = affineScale({ x: scale, y: scale });
+  const affineDataToTag = affineTranslation(display.origin);
+  const affineFieldToTag = affineCompose(affineDataToTag, affineFieldToData);
+  const affineTagToField = affineInvert(affineFieldToTag);
   return {
     display,
     scale,
     transformFieldToBrowser: `translate(${display.origin.x}px, ${display.origin.y}px) scale(${scale})`,
+    affineFieldToTag,
+    affineTagToField,
     moveOrigin,
     changeScale,
     scaleMin,

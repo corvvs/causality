@@ -8,6 +8,11 @@ export type Vector = {
   y: number;
 };
 
+export type Rectangle = {
+  r0: Vector;
+  r1: Vector;
+};
+
 /**
  * 一般的な線の形状情報
  */

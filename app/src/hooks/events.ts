@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 
 export const useOnPinch = (props: {
-  onPinch?: (e: WheelEvent) => void,
+  onPinchZoom?: (e: WheelEvent) => void,
+  onPinchScroll?: (e: WheelEvent) => void,
 }) => {
-  const { onPinch } = props;
+  const { onPinchZoom, onPinchScroll } = props;
   useEffect(() => {
     const preventDefault = (e: Event) => {
       e.preventDefault();
@@ -17,8 +18,12 @@ export const useOnPinch = (props: {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (e.ctrlKey) {
-        if (onPinch) {
-          onPinch(e);
+        if (onPinchZoom) {
+          onPinchZoom(e);
+        }
+      } else {
+        if (onPinchScroll) {
+          onPinchScroll(e);
         }
       }
     };
@@ -34,5 +39,5 @@ export const useOnPinch = (props: {
       document.removeEventListener('gesturestart', preventDefault);
       document.removeEventListener('wheel', onWheel);
     };
-  }, [onPinch]);
+  }, [onPinchScroll, onPinchZoom]);
 };

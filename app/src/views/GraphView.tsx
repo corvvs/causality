@@ -1,65 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
-import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../types";
-import { sprintf } from "sprintf-js";
+import { GraphNode, Vector } from "../types";
 import { useOnPinch } from "../hooks/events";
-import { ComponentWithProps } from "../types/components";
-import { NodeGroup } from "./GraphView/components";
+import { NodeGroup, ScaleView, SystemView } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
+import { DraggingTarget } from "./GraphView/types";
 
-
-type DraggingTarget = "node" | "field" | null;
-
-const SystemView = (props: {
-  graph: CausalGraph;
-  display: CausalDisplay;
-  draggingNode: GraphNode | null;
-  draggingOrigin: Vector | null;
-  draggingTarget: DraggingTarget;
-}) => {
-  const scale = Math.pow(10, props.display.magnitude);
-  return <div className="p-4 gap-4 flex flex-col border-2 border-green-500 text-xs text-left">
-    <p>
-      nodes: {props.graph.nodes.length}
-    </p>
-    <p>
-      display.origin: {`(${props.display.origin.x}, ${props.display.origin.y})`}
-    </p>
-    <p>
-      display.scale: {sprintf("%1.2f(%1.2f)", scale, props.display.magnitude)}
-    </p>
-    <p>
-      draggingNode: {props.draggingNode?.id || "none"}
-    </p>
-    <p>
-      draggingTarget: {props.draggingTarget || "none"}
-    </p>
-  </div>
-};
-
-const ScaleView: ComponentWithProps<{ getCenter: () => Vector | null }> = ({
-  getCenter
-}) => {
-  const {
-    display,
-    scale,
-    changeScale,
-    scaleMin,
-    scaleMax,
-  } = useDisplay();
-
-  return <div className="border-2 border-green-500">
-    <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
-      const center = getCenter();
-      if (!center) { return; }
-      changeScale(parseFloat(e.target.value), center);
-      e.stopPropagation();
-    }} />
-    <p>{Math.floor(scale * 100 + 0.5)}%</p>
-  </div>
-
-};
 
 export const GraphView = () => {
   const {
@@ -135,14 +82,18 @@ export const GraphView = () => {
   });
 
   useOnPinch({
-    onPinch: (e) => {
+    onPinchZoom: (e) => {
       if (!svgRef.current) { return; }
-      setTimeout(() => {
-        const center: Vector = { x: e.clientX, y: e.clientY };
-        const deltaMag = e.deltaY > 0 ? -0.02 : 0.018;
-        changeScale(display.magnitude + deltaMag, center);
-      }, 0);
-    }
+      const center: Vector = { x: e.clientX, y: e.clientY };
+      const deltaMag = e.deltaY > 0 ? -0.02 : 0.018;
+      changeScale(display.magnitude + deltaMag, center);
+    },
+    onPinchScroll: (e) => {
+      if (!svgRef.current) { return; }
+      const dx = e.deltaX;
+      const dy = e.deltaY;
+      moveOrigin(display.origin.x - dx, display.origin.y - dy);
+    },
   });
 
   const GridElement = <GridOverlay getViewRect={() => {
@@ -166,8 +117,6 @@ export const GraphView = () => {
         className="svg-master h-full w-full border-2 border-red-600"
         ref={svgRef}
       >
-
-        {/* <QuadrandOverlay /> */}
 
         {GridElement}
 

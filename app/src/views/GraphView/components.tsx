@@ -1,7 +1,10 @@
+import { sprintf } from "sprintf-js";
 import { SvgNodeShape } from "../../components/graph/SvgNodeShape";
 import { useDisplay } from "../../stores/display";
 import { useGraph } from "../../stores/graph";
+import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
+import { DraggingTarget } from "./types";
 
 export const QuadrandOverlay = () => {
   const {
@@ -45,4 +48,54 @@ export const NodeGroup: ComponentWithProps<DraggableProps> = (props) => {
     }
   </g>
 
+};
+
+export const ScaleView: ComponentWithProps<{ getCenter: () => Vector | null }> = ({
+  getCenter
+}) => {
+  const {
+    display,
+    scale,
+    changeScale,
+    scaleMin,
+    scaleMax,
+  } = useDisplay();
+
+  return <div className="border-2 border-green-500">
+    <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
+      const center = getCenter();
+      if (!center) { return; }
+      changeScale(parseFloat(e.target.value), center);
+      e.stopPropagation();
+    }} />
+    <p>{Math.floor(scale * 100 + 0.5)}%</p>
+  </div>
+
+};
+
+export const SystemView = (props: {
+  graph: CausalGraph;
+  display: CausalDisplay;
+  draggingNode: GraphNode | null;
+  draggingOrigin: Vector | null;
+  draggingTarget: DraggingTarget;
+}) => {
+  const scale = Math.pow(10, props.display.magnitude);
+  return <div className="p-4 gap-4 flex flex-col border-2 border-green-500 text-xs text-left">
+    <p>
+      nodes: {props.graph.nodes.length}
+    </p>
+    <p>
+      display.origin: {`(${props.display.origin.x}, ${props.display.origin.y})`}
+    </p>
+    <p>
+      display.scale: {sprintf("%1.2f(%1.2f)", scale, props.display.magnitude)}
+    </p>
+    <p>
+      draggingNode: {props.draggingNode?.id || "none"}
+    </p>
+    <p>
+      draggingTarget: {props.draggingTarget || "none"}
+    </p>
+  </div>
 };

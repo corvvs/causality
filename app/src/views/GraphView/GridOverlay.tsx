@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { affineApply } from "../../libs/affine";
 import { useDisplay } from "../../stores/display";
 import { Rectangle, Vector } from "../../types";
@@ -28,7 +29,7 @@ export const GridSubLayer: ComponentWithProps<{
   const grids: JSX.Element[] = [];
   const rect = props.getViewRect();
 
-  const gridDistance = gridD0 * Math.pow(4, -props.zoomLevel);
+  const gridDistance = useMemo(() => gridD0 * Math.pow(4, -props.zoomLevel), [props.zoomLevel]);
 
   const rt0: Vector = rect.r0;
   const rt1: Vector = rect.r1;
@@ -46,7 +47,7 @@ export const GridSubLayer: ComponentWithProps<{
   const nYGridMin = Math.ceil(yFMin / gridDistance);
   const nYGridMax = Math.floor(yFMax / gridDistance);
 
-  const opacity = Math.min(opacityForZoomLevel(props.zoomLevel, scale), 1);
+  const opacity = useMemo(() => Math.min(opacityForZoomLevel(props.zoomLevel, scale), 1), [props.zoomLevel, scale]);
 
   for (let i = 0; i <= nXGridMax - nXGridMin; i++) {
     const n = nXGridMin + i;
@@ -87,9 +88,8 @@ export const GridOverlay: ComponentWithProps<{
   const {
     scale,
   } = useDisplay();
-  const c = scale * gridD0;
-  const zoomLevelMin = Math.floor(Math.log2(c / gridDM) / 2 - 1);
-  const zoomLevelMax = Math.floor(Math.log2(c / gridDm) / 2);
+  const zoomLevelMin = useMemo(() => Math.floor(Math.log2(scale * gridD0 / gridDM) / 2 - 1), [scale]);
+  const zoomLevelMax = useMemo(() => Math.floor(Math.log2(scale * gridD0 / gridDm) / 2), [scale]);
   return <g className="grid-overlay">
     {
       Array.from({ length: zoomLevelMax - zoomLevelMin + 1 }, (_, i) => i + zoomLevelMin).map(zoomLevel => <GridSubLayer

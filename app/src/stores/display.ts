@@ -2,6 +2,7 @@ import { atom, useAtom } from "jotai";
 import { CausalDisplay, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { affineCompose, affineInvert, affineScale, affineTranslation } from "../libs/affine";
+import { useCallback, useMemo } from "react";
 
 const displayKey = "DISPLAY";
 const displayProvider = localStorageProvider<CausalDisplay>();
@@ -22,7 +23,7 @@ function magnitudeToScale(m: number) {
 export const useDisplay = () => {
   const [ display, setDisplay ] = useAtom(displayAtom);
 
-  const moveOrigin = (x: number, y: number) => {
+  const moveOrigin = useCallback((x: number, y: number) => {
     setDisplay((prev) => {
       return {
         ...prev,
@@ -32,9 +33,9 @@ export const useDisplay = () => {
         },
       };
     });
-  };
+  }, [setDisplay]);
 
-  const changeScale = (m: number, center: Vector) => {
+  const changeScale = useCallback((m: number, center: Vector) => {
     setDisplay((prev) => {
       const magNew = Math.max(scaleMin, Math.min(scaleMax, m));
       const scaleNew = magnitudeToScale(magNew);
@@ -50,13 +51,13 @@ export const useDisplay = () => {
         origin,
       };
     });
-  };
+  }, [setDisplay]);
 
   const scale = magnitudeToScale(display.magnitude);
-  const affineFieldToData = affineScale({ x: scale, y: scale });
-  const affineDataToTag = affineTranslation(display.origin);
-  const affineFieldToTag = affineCompose(affineDataToTag, affineFieldToData);
-  const affineTagToField = affineInvert(affineFieldToTag);
+  const affineFieldToData = useMemo(() => affineScale({ x: scale, y: scale }), [scale]);
+  const affineDataToTag = useMemo(() => affineTranslation(display.origin), [display.origin]);
+  const affineFieldToTag = useMemo(() => affineCompose(affineDataToTag, affineFieldToData), [affineDataToTag, affineFieldToData]);
+  const affineTagToField = useMemo(() => affineInvert(affineFieldToTag), [affineFieldToTag]);
   return {
     display,
     scale,

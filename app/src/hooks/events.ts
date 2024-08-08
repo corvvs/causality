@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useOnPinch = (props: {
   onPinchZoom?: (e: WheelEvent) => void,
@@ -10,7 +10,6 @@ export const useOnPinch = (props: {
       e.preventDefault();
     };
     const preventTouchDefault = (e: TouchEvent) => {
-      console.log("TOUCH")
       if (e.touches.length > 1) {
         e.preventDefault();
       }
@@ -40,4 +39,21 @@ export const useOnPinch = (props: {
       document.removeEventListener('wheel', onWheel);
     };
   }, [onPinchScroll, onPinchZoom]);
+};
+
+export const useRerenderOnResize = (ref: React.MutableRefObject<Element | null>) => {
+  const [, setSize] = useState(0);
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach((el) => {
+        setSize(el.contentRect.width * el.contentRect.height);
+      });
+    });
+    if (ref.current) {
+      resizeObserver.observe(ref.current);
+    }
+    return () => {
+      resizeObserver.disconnect();
+    };
+  });
 };

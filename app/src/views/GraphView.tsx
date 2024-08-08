@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
 import { GraphNode, Vector } from "../types";
-import { useOnPinch } from "../hooks/events";
+import { useOnPinch, useRerenderOnResize } from "../hooks/events";
 import { NodeGroup, ScaleView, SystemView } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggingTarget } from "./GraphView/types";
@@ -22,6 +22,7 @@ export const GraphView = () => {
   } = useDisplay();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+  useRerenderOnResize(svgRef);
   const [draggingTarget, setDraggingTarget] = useState<DraggingTarget>(null);
   const [draggingNode, setDraggingNode] = useState<GraphNode | null>(null);
   const [draggingOrigin, setDraggingOrigin] = useState<Vector | null>(null);

@@ -554,6 +554,10 @@ video {
   --tw-contain-style:  ;
 }
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .absolute {
   position: absolute;
 }
@@ -594,6 +598,38 @@ video {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.cursor-e-resize {
+  cursor: e-resize;
+}
+
+.cursor-n-resize {
+  cursor: n-resize;
+}
+
+.cursor-ne-resize {
+  cursor: ne-resize;
+}
+
+.cursor-nw-resize {
+  cursor: nw-resize;
+}
+
+.cursor-s-resize {
+  cursor: s-resize;
+}
+
+.cursor-se-resize {
+  cursor: se-resize;
+}
+
+.cursor-sw-resize {
+  cursor: sw-resize;
+}
+
+.cursor-w-resize {
+  cursor: w-resize;
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -626,6 +662,26 @@ video {
 .border-red-600 {
   --tw-border-opacity: 1;
   border-color: rgb(220 38 38 / var(--tw-border-opacity));
+}
+
+.fill-white {
+  fill: #fff;
+}
+
+.fill-transparent {
+  fill: transparent;
+}
+
+.stroke-black {
+  stroke: #000;
+}
+
+.stroke-transparent {
+  stroke: transparent;
+}
+
+.stroke-1 {
+  stroke-width: 1;
 }
 
 .p-4 {
@@ -713,3 +769,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+.hover\:fill-blue-400:hover {
+  fill: #60a5fa;
+}

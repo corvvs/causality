@@ -3,52 +3,35 @@ import { SvgNodeShape } from "../../components/graph/SvgNodeShape";
 import { useDisplay } from "../../stores/display";
 import { useGraph } from "../../stores/graph";
 import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../../types";
-import { ComponentWithProps, DraggableProps } from "../../types/components";
-import { DraggingTarget } from "./types";
+import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
+import { DraggingInfo } from "./types";
 
-export const QuadrandOverlay = () => {
-  const {
-    display,
-  } = useDisplay();
-  const quadrantTranslation = `translate(${display.origin.x}px, ${display.origin.y}px)`;
-  return <g
-    style={{
-      transform: quadrantTranslation,
-    }}
-  >
-    <line
-      x1={-100000} y1={0} x2={100000} y2={0}
-      stroke="white"
-    />
-    <line
-      x1={0} y1={-100000} x2={0} y2={100000}
-      stroke="white"
-    />
-  </g>
-};
+export const NodeGroup: ComponentWithProps<
+  {
+    selectedNodes: { [key: string]: GraphNode };
+  } &
+  DraggableProps &
+  SelectiveProps> = (props) => {
+    const {
+      graph,
+    } = useGraph();
 
-export const NodeGroup: ComponentWithProps<DraggableProps> = (props) => {
-  const {
-    graph,
-  } = useGraph();
-  const {
-    transformFieldToBrowser,
-  } = useDisplay();
+    return <>
+      {
+        graph.nodeOrder.map(nodeId => {
+          const node = graph.nodes[nodeId];
+          return <SvgNodeShape
+            key={node.id}
+            node={node}
+            isSelected={!!props.selectedNodes[node.id]}
+            click={props.click}
+            mouseDown={props.mouseDown}
+          />;
+        })
+      }
+    </>
 
-  return <g
-    style={{
-      transform: transformFieldToBrowser,
-    }}
-  >
-    {
-      graph.nodes.map(node => <SvgNodeShape
-        key={node.id} node={node}
-        mouseDown={props.mouseDown}
-      />)
-    }
-  </g>
-
-};
+  };
 
 export const ScaleView: ComponentWithProps<{ getCenter: () => Vector | null }> = ({
   getCenter
@@ -76,14 +59,13 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector | null }> =
 export const SystemView = (props: {
   graph: CausalGraph;
   display: CausalDisplay;
-  draggingNode: GraphNode | null;
-  draggingOrigin: Vector | null;
-  draggingTarget: DraggingTarget;
+  selectedNodes: { [key: string]: GraphNode };
+  draggingInfo: DraggingInfo;
 }) => {
   const scale = Math.pow(10, props.display.magnitude);
   return <div className="p-4 gap-4 flex flex-col border-2 border-green-500 text-xs text-left">
     <p>
-      nodes: {props.graph.nodes.length}
+      nodes: {props.graph.nodeOrder.length}
     </p>
     <p>
       display.origin: {`(${props.display.origin.x}, ${props.display.origin.y})`}
@@ -92,10 +74,13 @@ export const SystemView = (props: {
       display.scale: {sprintf("%1.2f(%1.2f)", scale, props.display.magnitude)}
     </p>
     <p>
-      draggingNode: {props.draggingNode?.id || "none"}
+      selectedNodes: {Object.keys(props.selectedNodes).length}
     </p>
     <p>
-      draggingTarget: {props.draggingTarget || "none"}
+      draggingNode: {props.draggingInfo.target === "node" ? props.draggingInfo.nodeId : "none"}
+    </p>
+    <p>
+      draggingTarget: {JSON.stringify(props.draggingInfo)}
     </p>
   </div>
 };

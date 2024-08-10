@@ -13,6 +13,11 @@ export type Rectangle = {
   r1: Vector;
 };
 
+export type Size = {
+  width: number;
+  height: number;
+};
+
 /**
  * 一般的な線の形状情報
  */
@@ -23,12 +28,11 @@ type LineShape = {
 export type GraphNode = GenericFields & {
   nodeType: string;
   position: Vector;
+  size: Size;
   z: number;
 };
 
 type RectangleShape = {
-  height: number;
-  width: number;
   line: LineShape;
 };
 
@@ -55,7 +59,8 @@ export type GraphEdge = GenericFields & {
 
 export type CausalGraph = {
   index: number;
-  nodes: GraphNode[];
+  nodes: { [id: string]: GraphNode };
+  nodeOrder: string[];
   edges: GraphEdge[];
 }
 

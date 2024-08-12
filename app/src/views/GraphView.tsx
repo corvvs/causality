@@ -218,7 +218,7 @@ export const GraphView = () => {
       <svg
         className="svg-master h-full w-full border-2 border-red-600"
         ref={svgRef}
-        onClick={(e) => {
+        onClick={() => {
           console.log("SVG ONCLICK");
           setSelectedNodes({});
         }}
@@ -234,6 +234,7 @@ export const GraphView = () => {
           <NodeGroup
             selectedNodes={selectedNodes}
             click={(e, node) => {
+              console.log(e)
               setSelectedNodes({ [node.id]: node });
             }}
 

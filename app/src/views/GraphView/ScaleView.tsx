@@ -17,9 +17,11 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
 
   const {
     registerStep,
+    stackedAnimations,
   } = useAnimationQueue();
 
   const animate = (from: number, to: number) => {
+    if (stackedAnimations > 0) { return; }
     registerStep({
       stateFrom: from,
       stateTo: to,

@@ -23,7 +23,6 @@ export const useAnimationQueue = () => {
       window.requestAnimationFrame(ignite);
       return;
     }
-    console.log("[ignite] animationState.queue.length", animationState.queue.length);
     const animation = animationState.queue[0];
     if (!startTime.current) { startTime.current = time; }
     const elapsed = time - startTime.current;
@@ -37,7 +36,6 @@ export const useAnimationQueue = () => {
       window.requestAnimationFrame(ignite);
       return;
     }
-    console.log("[ignite] end animation");
     setAnimationState((prev) => {
       return {
         queue: prev.queue.slice(1),
@@ -62,6 +60,7 @@ export const useAnimationQueue = () => {
   }, [ignite, animationState.queue]);
 
   return {
+    stackedAnimations: animationState.queue.length,
     registerStep,
   };
 }

@@ -43,13 +43,13 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     }} />
     <p>{Math.floor(scale * 100 + 0.5)}%</p>
     <button onClick={() => {
-      animate(display.magnitude, display.magnitude - 0.5);
+      animate(display.magnitude, display.magnitude - 0.25);
     }}>-</button>
     <button onClick={() => {
       animate(display.magnitude, 0);
     }}>reset</button>
     <button onClick={() => {
-      animate(display.magnitude, display.magnitude + 0.5);
+      animate(display.magnitude, display.magnitude + 0.25);
     }}>+</button>
   </div>
 

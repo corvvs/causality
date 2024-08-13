@@ -1,4 +1,4 @@
-import { registerStep } from "../../hooks/animation_queue";
+import { useAnimationQueue } from "../../hooks/animation_queue";
 import { easing } from "../../libs/easing";
 import { useDisplay } from "../../stores/display";
 import { Vector } from "../../types";
@@ -15,6 +15,25 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     scaleMax,
   } = useDisplay();
 
+  const {
+    registerStep,
+  } = useAnimationQueue();
+
+  const animate = (from: number, to: number) => {
+    registerStep({
+      stateFrom: from,
+      stateTo: to,
+      duration: 250,
+      easing: easing.easeOutExpotential,
+      updater: (magNew) => {
+        const center = getCenter();
+        if (center) {
+          changeScale(magNew, center);
+        }
+      },
+    });
+  };
+
   return <div className="border-2 border-green-500 bg-black/50">
     <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
       const center = getCenter();
@@ -23,20 +42,15 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
       e.stopPropagation();
     }} />
     <p>{Math.floor(scale * 100 + 0.5)}%</p>
-    <button onClick={(e) => {
-      registerStep({
-        stateFrom: display.magnitude,
-        stateTo: 0,
-        duration: 250,
-        easing: easing.easeOutExpotential,
-      }, (magNew) => {
-        const center = getCenter();
-        if (center) {
-          changeScale(magNew, center);
-        }
-      });
-      e.stopPropagation();
+    <button onClick={() => {
+      animate(display.magnitude, display.magnitude - 0.5);
+    }}>-</button>
+    <button onClick={() => {
+      animate(display.magnitude, 0);
     }}>reset</button>
+    <button onClick={() => {
+      animate(display.magnitude, display.magnitude + 0.5);
+    }}>+</button>
   </div>
 
 };

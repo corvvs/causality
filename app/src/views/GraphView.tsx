@@ -3,10 +3,12 @@ import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
 import { Vector } from "../types";
 import { useOnPinch, useRerenderOnResize } from "../hooks/events";
-import { NodeGroup, ScaleView, SystemView } from "./GraphView/components";
+import { NodeGroup, SystemView } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
+import { affineApply } from "../libs/affine";
+import { ScaleView } from "./GraphView/ScaleView";
 
 export const GraphView = () => {
   const {
@@ -20,6 +22,7 @@ export const GraphView = () => {
     moveOrigin,
     changeScale,
     transformFieldToBrowser,
+    affineTagToField,
   } = useDisplay();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -36,8 +39,9 @@ export const GraphView = () => {
     ...cursor,
   };
 
-  useEffect(() => {
 
+  useEffect(() => {
+    window.requestAnimationFrame
     const handleMouseMove = (event: any) => {
       if (!draggingInfo.target) { return; }
       if (!draggingInfo.origin) { return; }
@@ -216,7 +220,7 @@ export const GraphView = () => {
   return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">
       <svg
-        className="svg-master h-full w-full border-2 border-red-600"
+        className="svg-master h-full w-full"
         ref={svgRef}
         onClick={() => {
           console.log("SVG ONCLICK");
@@ -321,12 +325,12 @@ export const GraphView = () => {
       </svg>
     </div>
 
-    <div className="absolute flex flex-row gap-4 right-0 p-4"
+    <div className="absolute flex flex-row items-center gap-4 right-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
 
       <ScaleView getCenter={() => {
-        if (!svgRef.current) { return null; }
+        if (!svgRef.current) { return { x: 0, y: 0 }; }
         const svgRect = svgRef.current.getClientRects()[0];
         const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
         return center;
@@ -335,7 +339,11 @@ export const GraphView = () => {
       <div className="border-2 border-green-500">
         <button
           onClick={() => {
-            newNode({ x: -display.origin.x / scale, y: -display.origin.y / scale });
+            if (!svgRef.current) { return null; }
+            const svgRect = svgRef.current.getClientRects()[0];
+            const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+            const tCenter = affineApply(affineTagToField, center);
+            newNode(tCenter);
           }}
         >Add Node</button>
       </div>

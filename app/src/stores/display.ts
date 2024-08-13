@@ -13,8 +13,8 @@ const displayAtom = atom<CausalDisplay>(displayProvider.load(displayKey) ?? {
   magnitude: 0,
 });
 
-const scaleMax = +5;
-const scaleMin = -5;
+const scaleMax = +1;
+const scaleMin = -1;
 
 function magnitudeToScale(m: number) {
   return Math.pow(10, m);

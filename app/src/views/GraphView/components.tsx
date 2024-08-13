@@ -1,8 +1,7 @@
 import { sprintf } from "sprintf-js";
 import { SvgNodeShape } from "../../components/graph/SvgNodeShape";
-import { useDisplay } from "../../stores/display";
 import { useGraph } from "../../stores/graph";
-import { CausalDisplay, CausalGraph, GraphNode, Vector } from "../../types";
+import { CausalDisplay, CausalGraph, GraphNode } from "../../types";
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
 import { DraggingInfo } from "./types";
 
@@ -33,28 +32,7 @@ export const NodeGroup: ComponentWithProps<
 
   };
 
-export const ScaleView: ComponentWithProps<{ getCenter: () => Vector | null }> = ({
-  getCenter
-}) => {
-  const {
-    display,
-    scale,
-    changeScale,
-    scaleMin,
-    scaleMax,
-  } = useDisplay();
 
-  return <div className="border-2 border-green-500">
-    <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
-      const center = getCenter();
-      if (!center) { return; }
-      changeScale(parseFloat(e.target.value), center);
-      e.stopPropagation();
-    }} />
-    <p>{Math.floor(scale * 100 + 0.5)}%</p>
-  </div>
-
-};
 
 export const SystemView = (props: {
   graph: CausalGraph;
@@ -63,7 +41,7 @@ export const SystemView = (props: {
   draggingInfo: DraggingInfo;
 }) => {
   const scale = Math.pow(10, props.display.magnitude);
-  return <div className="p-4 gap-4 flex flex-col border-2 border-green-500 text-xs text-left">
+  return <div className="p-4 gap-4 flex flex-col border-2 border-green-500 bg-black/50 text-xs text-left">
     <p>
       nodes: {props.graph.nodeOrder.length}
     </p>

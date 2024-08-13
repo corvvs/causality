@@ -1,4 +1,3 @@
-import { sprintf } from "sprintf-js";
 import { RectangleNode } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 
@@ -15,7 +14,6 @@ export const SvgNodeInnterText: ComponentWithProps<{ node: RectangleNode }> = (p
     <div
       className="w-full h-full flex flex-col justify-center items-center text-xs"
     >
-      <p>{sprintf("(%1.2f, %1.2f)", node.position.x, node.position.y)}</p>
       <p>{node.id}</p>
     </div>
   </foreignObject>

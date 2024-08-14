@@ -1,7 +1,6 @@
 import { atom, useAtom } from "jotai";
 import { CausalGraph, GraphNode, RectangleNode, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
-import { nanoid } from "nanoid";
 
 const graphKey = "GRAPH";
 const graphProvider = localStorageProvider<CausalGraph>();

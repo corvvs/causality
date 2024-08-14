@@ -15,7 +15,7 @@ const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
 
 const createDefaultNode = (index: number, position: Vector): RectangleNode => {
   return {
-    id: nanoid(),
+    id: `node_${index}`,
     position,
     z: index,
     label: "",

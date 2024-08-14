@@ -36,7 +36,7 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     });
   };
 
-  return <div className="border-2 border-green-500 bg-black/50">
+  return <div className="system-box border-2 bg-black/50">
     <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
       const center = getCenter();
       if (!center) { return; }

@@ -58,12 +58,11 @@ export const SvgNodeRectangleSelectedShape: ComponentWithProps<{ node: Rectangle
 
   return <>
     <rect
-      className="pointer-events-none"
+      className="node-selection-box pointer-events-none"
       x={r0.x - margin} y={r0.y - margin}
       width={r1.x - r0.x + margin * 2}
       height={r1.y - r0.y + margin * 2}
       fill="transparent"
-      stroke="royalblue"
       strokeWidth={1.5}
     />
 
@@ -84,7 +83,7 @@ export const SvgNodeRectangleSelectedShape: ComponentWithProps<{ node: Rectangle
 
     {centers2.map((rs) => <rect
       key={rs.type}
-      className={`${resizerCursor[rs.type]} stroke-black stroke-1 fill-white hover:fill-blue-400`}
+      className={`${resizerCursor[rs.type]} stroke-1 hover:fill-blue-400`}
       x={rs.center.x - rs.size.width / 2} y={rs.center.y - rs.size.height / 2}
       width={rs.size.width} height={rs.size.height}
       onMouseDown={(e) => {
@@ -114,7 +113,6 @@ export const SvgNodeRectangleShape: ComponentWithProps<CommonProps<RectangleNode
       width={node.size.width}
       height={node.size.height}
       fill="transparent"
-      stroke="white"
       strokeWidth={node.shape.line.lineWidth}
       onClick={(e) => {
         if (!props.click) { return; }

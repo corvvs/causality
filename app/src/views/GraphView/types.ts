@@ -1,11 +1,12 @@
 import { ResizerType } from "../../components/graph/SvgNodeRectangleShape";
-import { GraphNode, Vector } from "../../types";
+import { Vector } from "../../types";
 
 export type DraggingTarget = "node" | "field" | null;
 
 export type NodeSelection = {
-  [nodeId: string]: GraphNode;
-}
+  ids: string[];
+  set: { [nodeId: string]: boolean; }
+};
 
 export type DraggableMatter = {
   target: "node";

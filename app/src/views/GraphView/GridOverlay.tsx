@@ -57,7 +57,6 @@ export const GridSubLayer: ComponentWithProps<{
       key={`x_${i}`}
       x1={vt.x} y1={rt0.y}
       x2={vt.x} y2={rt1.y}
-      stroke="white"
       strokeWidth="0.25"
       opacity={opacity}
     />)
@@ -71,7 +70,6 @@ export const GridSubLayer: ComponentWithProps<{
       key={`y_${i}`}
       x1={rt0.x} y1={vt.y}
       x2={rt1.x} y2={vt.y}
-      stroke="white"
       strokeWidth="0.25"
       opacity={opacity}
     />)

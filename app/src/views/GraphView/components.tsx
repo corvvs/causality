@@ -1,13 +1,13 @@
 import { sprintf } from "sprintf-js";
 import { SvgNodeShape } from "../../components/graph/SvgNodeShape";
 import { useGraph } from "../../stores/graph";
-import { CausalDisplay, CausalGraph, GraphNode } from "../../types";
+import { CausalDisplay, CausalGraph } from "../../types";
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
-import { DraggingInfo } from "./types";
+import { DraggingInfo, NodeSelection } from "./types";
 
 export const NodeGroup: ComponentWithProps<
   {
-    selectedNodes: { [key: string]: GraphNode };
+    selectedNodes: NodeSelection;
   } &
   DraggableProps &
   SelectiveProps> = (props) => {
@@ -22,7 +22,7 @@ export const NodeGroup: ComponentWithProps<
           return <SvgNodeShape
             key={node.id}
             node={node}
-            isSelected={!!props.selectedNodes[node.id]}
+            isSelected={!!props.selectedNodes.set[node.id]}
             click={props.click}
             mouseDown={props.mouseDown}
           />;
@@ -37,11 +37,11 @@ export const NodeGroup: ComponentWithProps<
 export const SystemView = (props: {
   graph: CausalGraph;
   display: CausalDisplay;
-  selectedNodes: { [key: string]: GraphNode };
+  selectedNodes: NodeSelection;
   draggingInfo: DraggingInfo;
 }) => {
   const scale = Math.pow(10, props.display.magnitude);
-  return <div className="p-4 gap-4 flex flex-col border-2 border-green-500 bg-black/50 text-xs text-left">
+  return <div className="system-box p-4 gap-4 flex flex-col border-2 bg-black/50 text-xs text-left">
     <p>
       nodes: {props.graph.nodeOrder.length}
     </p>
@@ -52,7 +52,7 @@ export const SystemView = (props: {
       display.scale: {sprintf("%1.2f(%1.2f)", scale, props.display.magnitude)}
     </p>
     <p>
-      selectedNodes: {Object.keys(props.selectedNodes).length}
+      selectedNodes: {props.selectedNodes.ids.length}
     </p>
     <p>
       draggingNode: {props.draggingInfo.target === "node" ? props.draggingInfo.nodeId : "none"}

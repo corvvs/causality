@@ -1,12 +1,10 @@
 import { SvgNodeSelectedShape } from "../../components/graph/SvgNodeShape";
 import { useGraph } from "../../stores/graph";
-import { GraphNode } from "../../types";
 import { DraggableProps } from "../../types/components";
+import { NodeSelection } from "./types";
 
 export const SelectedLayer = (props: {
-  selectedNodes: {
-    [nodeId: string]: GraphNode;
-  }
+  selectedNodes: NodeSelection;
 } & DraggableProps) => {
   const {
     graph
@@ -14,7 +12,7 @@ export const SelectedLayer = (props: {
 
 
   return <g>
-    {Object.keys(props.selectedNodes).map((id) => {
+    {props.selectedNodes.ids.map((id) => {
       const node = graph.nodes[id];
       return <SvgNodeSelectedShape key={node.id} node={node} {...props} />
     })}

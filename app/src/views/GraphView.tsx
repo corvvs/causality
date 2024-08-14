@@ -9,6 +9,7 @@ import { DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { affineApply } from "../libs/affine";
 import { ScaleView } from "./GraphView/ScaleView";
+import { NodeEditView } from "./GraphView/NodeEditView";
 
 export const GraphView = () => {
   const {
@@ -29,7 +30,10 @@ export const GraphView = () => {
   useRerenderOnResize(svgRef);
 
 
-  const [selectedNodes, setSelectedNodes] = useState<NodeSelection>({});
+  const [selectedNodes, setSelectedNodes] = useState<NodeSelection>({
+    ids: [],
+    set: {},
+  });
   const [draggingInfo, setDraggingInfo] = useState<DraggingInfo>({
     target: null,
   });
@@ -220,11 +224,11 @@ export const GraphView = () => {
   return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">
       <svg
-        className="svg-master h-full w-full"
+        className="h-full w-full"
         ref={svgRef}
         onClick={() => {
           console.log("SVG ONCLICK");
-          setSelectedNodes({});
+          setSelectedNodes({ ids: [], set: {} });
         }}
       >
 
@@ -239,7 +243,14 @@ export const GraphView = () => {
             selectedNodes={selectedNodes}
             click={(e, node) => {
               console.log(e)
-              setSelectedNodes({ [node.id]: node });
+              if (!selectedNodes.set[node.id]) {
+                setSelectedNodes((prev) => {
+                  return {
+                    ids: [...prev.ids, node.id],
+                    set: { ...prev.set, [node.id]: true },
+                  }
+                });
+              }
             }}
 
             mouseDown={(e, draggableMatter) => {
@@ -325,18 +336,11 @@ export const GraphView = () => {
       </svg>
     </div>
 
-    <div className="absolute flex flex-row items-center gap-4 right-0 p-4"
+    <div className="absolute flex flex-row items-center gap-4 left-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
 
-      <ScaleView getCenter={() => {
-        if (!svgRef.current) { return { x: 0, y: 0 }; }
-        const svgRect = svgRef.current.getClientRects()[0];
-        const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-        return center;
-      }} />
-
-      <div className="border-2 border-green-500">
+      <div className="system-box border-2">
         <button
           onClick={() => {
             if (!svgRef.current) { return null; }
@@ -347,7 +351,23 @@ export const GraphView = () => {
           }}
         >Add Node</button>
       </div>
+
+      <ScaleView getCenter={() => {
+        if (!svgRef.current) { return { x: 0, y: 0 }; }
+        const svgRect = svgRef.current.getClientRects()[0];
+        const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+        return center;
+      }} />
     </div>
+
+    {Object.keys(selectedNodes.ids).length === 1 && <div className="absolute right-0 top-0 p-4"
+      onMouseDown={(e) => { e.stopPropagation(); }}
+    >
+      <NodeEditView
+        selectedNodes={selectedNodes}
+      />
+    </div>}
+
 
     <div className="absolute left-0 bottom-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}

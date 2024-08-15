@@ -3,13 +3,15 @@ import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
 import { Vector } from "../types";
 import { useOnPinch, useRerenderOnResize } from "../hooks/events";
-import { NodeGroup, SystemView } from "./GraphView/components";
+import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { affineApply } from "../libs/affine";
 import { ScaleView } from "./GraphView/ScaleView";
 import { NodeEditView } from "./GraphView/NodeEditView";
+import { SystemView } from "./GraphView/SystemView";
+import { ThemeSelector } from "../components/ThemeSelector";
 
 export const GraphView = () => {
   const {
@@ -244,10 +246,10 @@ export const GraphView = () => {
             click={(e, node) => {
               console.log(e)
               if (!selectedNodes.set[node.id]) {
-                setSelectedNodes((prev) => {
+                setSelectedNodes(() => {
                   return {
-                    ids: [...prev.ids, node.id],
-                    set: { ...prev.set, [node.id]: true },
+                    ids: [node.id],
+                    set: { [node.id]: true },
                   }
                 });
               }
@@ -358,6 +360,11 @@ export const GraphView = () => {
         const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
         return center;
       }} />
+
+      <div className="system-box border-2 p-2">
+        <ThemeSelector />
+      </div>
+
     </div>
 
     {Object.keys(selectedNodes.ids).length === 1 && <div className="absolute right-0 top-0 p-4"
@@ -373,8 +380,6 @@ export const GraphView = () => {
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
       <SystemView
-        graph={graph}
-        display={display}
         selectedNodes={selectedNodes}
         draggingInfo={draggingInfo}
       />

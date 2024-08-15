@@ -558,8 +558,16 @@ video {
   pointer-events: none;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .absolute {
   position: absolute;
+}
+
+.relative {
+  position: relative;
 }
 
 .bottom-0 {
@@ -578,8 +586,16 @@ video {
   top: 0px;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 .flex {
   display: flex;
+}
+
+.h-\[1\.5rem\] {
+  height: 1.5rem;
 }
 
 .h-full {
@@ -678,6 +694,10 @@ video {
   stroke-width: 1;
 }
 
+.p-1 {
+  padding: 0.25rem;
+}
+
 .p-2 {
   padding: 0.5rem;
 }
@@ -690,9 +710,21 @@ video {
   text-align: left;
 }
 
+.align-middle {
+  vertical-align: middle;
+}
+
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 
 :root {
@@ -708,6 +740,7 @@ video {
   --foreground-secondary: #807d83;
   --foreground-bad: #e22f59;
   --background: #e8edec;
+  --background-50: rgba(#e8edec, 0.5);
   --background-secondary: #d4d4d4;
   --foreground-schema: #888;
   --foreground-key: #3c39d5;
@@ -732,30 +765,29 @@ video {
   --flippable-transition-time: 0.096s;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground: #eee7f7;
-    --foreground-secondary: #66606e;
-    --foreground-bad: #ea5477;
-    --background: #1d1d1f;
-    --background-secondary: #33333a;
-    --foreground-schema: #b3b3b3;
-    --foreground-key: #3c7aff;
-    --foreground-string: #eaa18b;
-    --foreground-number: #7cda65;
-    --foreground-true: #73ff9d;
-    --foreground-false: #b9d6b1;
-    --background-key-0: #2a2c34;
-    --background-key-1: #373a30;
-    --background-key-2: #3b313b;
-    --background-key-3: #323b37;
-    --background-key-4: #3d3432;
-    --background-textarea: #303030;
-    --matched-row: #2f463e;
-    --narrowing-base: #5822a3;
-    --selected-row: #096865;
-    --line-number: #858dff;
-  }
+:root[data-theme='dark'] {
+  --foreground: #eee7f7;
+  --foreground-secondary: #66606e;
+  --foreground-bad: #ea5477;
+  --background: #1d1d1f;
+  --background-50: rgba(#1d1d1f, 0.5);
+  --background-secondary: #33333a;
+  --foreground-schema: #b3b3b3;
+  --foreground-key: #3c7aff;
+  --foreground-string: #eaa18b;
+  --foreground-number: #7cda65;
+  --foreground-true: #73ff9d;
+  --foreground-false: #b9d6b1;
+  --background-key-0: #2a2c34;
+  --background-key-1: #373a30;
+  --background-key-2: #3b313b;
+  --background-key-3: #323b37;
+  --background-key-4: #3d3432;
+  --background-textarea: #303030;
+  --matched-row: #2f463e;
+  --narrowing-base: #5822a3;
+  --selected-row: #096865;
+  --line-number: #858dff;
 }
 
 a {
@@ -776,6 +808,8 @@ body {
   min-height: 100vh;
   color: var(--foreground);
   background-color: var(--background);
+  transition: color var(--theme-transition);
+  transition: background-color var(--theme-transition);
 }
 
 h1 {
@@ -783,7 +817,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+/* button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -802,7 +836,7 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
+} */
 
 line {
   stroke: var(--foreground);
@@ -818,6 +852,7 @@ rect {
 
 .system-box {
   border-color: lightgreen;
+  background-color: var(--background-50);
 }
 
 .edit-box {
@@ -832,6 +867,41 @@ input[type="text"] {
   border-width: 1pt;
   border-color: var(--foreground);
   padding: 0.5em;
+}
+
+.multiple-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: normal;
+  align-items: normal;
+  row-gap: 0;
+  padding: 0;
+  background-color: var(--background);
+  .multiple-buttons-button {
+    z-index: 1;
+    padding: 0.15rem 0.40rem;
+    height: 2rem;
+    color: var(--foreground);
+    &:hover {
+      color: var(--background);
+      transition: color var(--flippable-transition);
+      transition: background-color var(--flippable-transition);
+    }
+    &.active {
+      color: var(--background);
+      background-color: var(--foreground);
+      text-decoration: underline;
+    }
+  }
+}
+
+.transient-backdrop {
+  position: absolute;
+  z-index: 0;
+  height: 100%;
+  padding: 0.15rem 0.40rem;
+  pointer-events: none;
+  background-color: var(--foreground);
 }
 
 /* @media (prefers-color-scheme: light) {

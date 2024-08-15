@@ -1,9 +1,7 @@
-import { sprintf } from "sprintf-js";
 import { SvgNodeShape } from "../../components/graph/SvgNodeShape";
 import { useGraph } from "../../stores/graph";
-import { CausalDisplay, CausalGraph } from "../../types";
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
-import { DraggingInfo, NodeSelection } from "./types";
+import { NodeSelection } from "./types";
 
 export const NodeGroup: ComponentWithProps<
   {
@@ -34,31 +32,3 @@ export const NodeGroup: ComponentWithProps<
 
 
 
-export const SystemView = (props: {
-  graph: CausalGraph;
-  display: CausalDisplay;
-  selectedNodes: NodeSelection;
-  draggingInfo: DraggingInfo;
-}) => {
-  const scale = Math.pow(10, props.display.magnitude);
-  return <div className="system-box p-4 gap-4 flex flex-col border-2 bg-black/50 text-xs text-left">
-    <p>
-      nodes: {props.graph.nodeOrder.length}
-    </p>
-    <p>
-      display.origin: {`(${props.display.origin.x}, ${props.display.origin.y})`}
-    </p>
-    <p>
-      display.scale: {sprintf("%1.2f(%1.2f)", scale, props.display.magnitude)}
-    </p>
-    <p>
-      selectedNodes: {props.selectedNodes.ids.length}
-    </p>
-    <p>
-      draggingNode: {props.draggingInfo.target === "node" ? props.draggingInfo.nodeId : "none"}
-    </p>
-    <p>
-      draggingTarget: {JSON.stringify(props.draggingInfo)}
-    </p>
-  </div>
-};

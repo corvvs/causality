@@ -40,13 +40,17 @@ export type GraphNode = GenericFields & AppearanceFields & {
   z: number;
 };
 
-type RectangleShape = {
+type RectangleLikeShape = {
   line: LineShape;
 };
 
-type CircleShape = {
-  line: LineShape;
-};
+type RectangleShape = RectangleLikeShape;
+
+type CircleShape = RectangleLikeShape;
+
+export type RectangleLikeNode = GraphNode & {
+  shape: RectangleLikeShape;
+}
 
 export type RectangleNode = GraphNode & {
   nodeType: "Rectangle";

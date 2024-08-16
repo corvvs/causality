@@ -1,5 +1,11 @@
-import { ResizerType } from "../../components/graph/SvgNodeRectangleShape";
-import { Vector } from "../../types";
+import { Size, Vector } from "../../types";
+
+export type ResizerType = "NW" | "NE" | "SE" | "SW" | "N" | "E" | "S" | "W";
+export type Resizer = {
+  center: Vector;
+  size: Size;
+  type: ResizerType;
+};
 
 export type DraggingTarget = "node" | "field" | null;
 

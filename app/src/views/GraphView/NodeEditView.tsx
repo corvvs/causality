@@ -1,5 +1,9 @@
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { useGraph } from "../../stores/graph";
 import { NodeSelection } from "./types";
+import { useState } from "react";
+import { ColorValue } from "../../types";
+import { ColorPicker } from "../../components/ColorPicker";
 
 export const NodeEditView = (props: {
   selectedNodes: NodeSelection;
@@ -10,12 +14,18 @@ export const NodeEditView = (props: {
     graph,
     updateNode,
   } = useGraph();
-
   const node = graph.nodes[firstId];
+
+  const color = node.labelColor;
+  const setColor = (v: ColorValue | null) => {
+    updateNode(firstId, {
+      labelColor: v || undefined,
+    });
+  };
 
   return <div className="system-box p-4 gap-4 flex flex-col border-2 text-xs text-left">
 
-    <div className="edit-box p-2 gap-2">
+    <div className="p-2 gap-2">
       <label>Text</label>
       <div>
         <input
@@ -29,6 +39,28 @@ export const NodeEditView = (props: {
         />
       </div>
     </div>
+
+
+    <div className="p-2 gap-2">
+      <Popover className="relative">
+        <label>
+          <PopoverButton>Text Color</PopoverButton>
+          <PopoverPanel anchor="bottom" transition className="flex flex-col transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0">
+            {({ close }) => (
+              <ColorPicker currentColor={color} setColor={(v: ColorValue | null) => {
+                setColor(v);
+                close();
+              }} />
+            )}
+          </PopoverPanel>
+        </label>
+        <div>
+          <label>{color || "(none)"}</label>
+        </div>
+      </Popover>
+    </div>
+
+
   </div>
 
 };

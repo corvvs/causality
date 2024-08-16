@@ -594,6 +594,14 @@ video {
   display: flex;
 }
 
+.grid {
+  display: grid;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
 .h-\[1\.5rem\] {
   height: 1.5rem;
 }
@@ -604,6 +612,10 @@ video {
 
 .h-screen {
   height: 100vh;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .w-full {
@@ -650,6 +662,14 @@ video {
   cursor: w-resize;
 }
 
+.grid-flow-row {
+  grid-auto-flow: row;
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -672,6 +692,14 @@ video {
 
 .gap-4 {
   gap: 1rem;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
 }
 
 .border-2 {
@@ -714,6 +742,11 @@ video {
   vertical-align: middle;
 }
 
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
@@ -725,6 +758,14 @@ video {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 :root {
@@ -741,6 +782,7 @@ video {
   --foreground-bad: #e22f59;
   --background: #e8edec;
   --background-50: rgba(#e8edec, 0.5);
+  --background-75: rgba(#e8edec, 0.75);
   --background-secondary: #d4d4d4;
   --foreground-schema: #888;
   --foreground-key: #3c39d5;
@@ -771,6 +813,7 @@ video {
   --foreground-bad: #ea5477;
   --background: #1d1d1f;
   --background-50: rgba(#1d1d1f, 0.5);
+  --background-75: rgba(#1d1d1f, 0.75);
   --background-secondary: #33333a;
   --foreground-schema: #b3b3b3;
   --foreground-key: #3c7aff;
@@ -846,18 +889,28 @@ rect {
   stroke: var(--foreground);
 }
 
+.ce-button {
+  background-color: var(--background);
+  padding: 0.25rem 1rem;
+  &:hover {
+    color: var(--background);
+    background-color: var(--foreground);
+  }
+}
+
 .node-selection-box {
   stroke: royalblue;
 }
 
 .system-box {
   border-color: lightgreen;
-  background-color: var(--background-50);
+  background-color: var(--background-75);
 }
 
 .edit-box {
   border-color: var(--foreground);
   border-width: 1pt;
+  background-color: var(--background-secondary);
 }
 
 textarea,
@@ -921,4 +974,20 @@ input[type="text"] {
 
 .hover\:fill-blue-400:hover {
   fill: #60a5fa;
+}
+
+.hover\:shadow-md:hover {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.data-\[closed\]\:scale-95[data-closed] {
+  --tw-scale-x: .95;
+  --tw-scale-y: .95;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.data-\[closed\]\:opacity-0[data-closed] {
+  opacity: 0;
 }

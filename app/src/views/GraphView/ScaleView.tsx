@@ -1,3 +1,4 @@
+import { Button } from "@headlessui/react";
 import { useAnimationQueue } from "../../hooks/animation_queue";
 import { easing } from "../../libs/easing";
 import { useDisplay } from "../../stores/display";
@@ -44,15 +45,15 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
       e.stopPropagation();
     }} />
     <p>{Math.floor(scale * 100 + 0.5)}%</p>
-    <button onClick={() => {
+    <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, display.magnitude - 0.25);
-    }}>-</button>
-    <button onClick={() => {
+    }}>-</Button>
+    <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, 0);
-    }}>reset</button>
-    <button onClick={() => {
+    }}>reset</Button>
+    <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, display.magnitude + 0.25);
-    }}>+</button>
+    }}>+</Button>
   </div>
 
 };

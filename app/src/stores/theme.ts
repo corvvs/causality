@@ -5,7 +5,7 @@ const actualColorThemes = ["light", "dark"] as const;
 export type ActualColorTheme = typeof actualColorThemes[number];
 export type ColorTheme = "system" | ActualColorTheme
 
-const colorThemeAtom = atom<ColorTheme>("system");
+const colorThemeAtom = atom<ColorTheme>(loadTheme() || "system");
 const systemPreferredThemeAtom = atom<ActualColorTheme | null>(null);
 const effectiveColorThemeAtom = atom<ActualColorTheme>(
   (get) => {

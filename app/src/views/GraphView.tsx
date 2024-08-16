@@ -12,6 +12,7 @@ import { ScaleView } from "./GraphView/ScaleView";
 import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
 import { ThemeSelector } from "../components/ThemeSelector";
+import { Button } from "@headlessui/react";
 
 export const GraphView = () => {
   const {
@@ -343,7 +344,7 @@ export const GraphView = () => {
     >
 
       <div className="system-box border-2">
-        <button
+        <Button className="ce-button rounded text-lg"
           onClick={() => {
             if (!svgRef.current) { return null; }
             const svgRect = svgRef.current.getClientRects()[0];
@@ -351,7 +352,7 @@ export const GraphView = () => {
             const tCenter = affineApply(affineTagToField, center);
             newNode(tCenter);
           }}
-        >Add Node</button>
+        >Add Node</Button>
       </div>
 
       <ScaleView getCenter={() => {

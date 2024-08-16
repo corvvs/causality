@@ -1,7 +1,6 @@
-type GenericFields = {
-  id: string;
-  label: string | null;
-};
+type ColorName = string;
+type ColorHex = `#${string}`;
+export type ColorValue = ColorName | ColorHex;
 
 export type Vector = {
   x: number;
@@ -18,6 +17,15 @@ export type Size = {
   height: number;
 };
 
+type AppearanceFields = {
+  labelColor?: ColorValue;
+};
+
+type GenericFields = {
+  id: string;
+  label: string | null;
+};
+
 /**
  * 一般的な線の形状情報
  */
@@ -25,7 +33,7 @@ type LineShape = {
   lineWidth: number;
 };
 
-export type GraphNode = GenericFields & {
+export type GraphNode = GenericFields & AppearanceFields & {
   nodeType: string;
   position: Vector;
   size: Size;

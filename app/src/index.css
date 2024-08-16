@@ -21,6 +21,7 @@
   --foreground-bad: #e22f59;
   --background: #e8edec;
   --background-50: rgba(#e8edec, 0.5);
+  --background-75: rgba(#e8edec, 0.75);
   --background-secondary: #d4d4d4;
   --foreground-schema: #888;
   --foreground-key: #3c39d5;
@@ -54,6 +55,7 @@
   --foreground-bad: #ea5477;
   --background: #1d1d1f;
   --background-50: rgba(#1d1d1f, 0.5);
+  --background-75: rgba(#1d1d1f, 0.75);
   --background-secondary: #33333a;
   --foreground-schema: #b3b3b3;
   --foreground-key: #3c7aff;
@@ -132,18 +134,29 @@ rect {
   stroke: var(--foreground);
 }
 
+.ce-button {
+  background-color: var(--background);
+  padding: 0.25rem 1rem;
+
+  &:hover {
+    color: var(--background);
+    background-color: var(--foreground);
+  }
+}
+
 .node-selection-box {
   stroke: royalblue;
 }
 
 .system-box {
   border-color: lightgreen;
-  background-color: var(--background-50);
+  background-color: var(--background-75);
 }
 
 .edit-box {
   border-color: var(--foreground);
   border-width: 1pt;
+  background-color: var(--background-secondary);
 }
 
 textarea,

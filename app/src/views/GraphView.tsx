@@ -8,15 +8,10 @@ import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { affineApply } from "../libs/affine";
-import { ScaleView } from "./GraphView/ScaleView";
 import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
-import { ThemeSelector } from "../components/ThemeSelector";
 import { Button } from "@headlessui/react";
 import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
-import { InlineIcon } from "../components/InlineIcon";
-import { FaShapes } from "react-icons/fa";
-import { SlMagnifier } from "react-icons/sl";
 import { BasicPalette } from "../components/palette/BasicPalette";
 
 function resizeRectangleLikeNode(props: {

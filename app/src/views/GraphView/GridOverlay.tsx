@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { affineApply } from "../../libs/affine";
+import { affineApply, AffineMatrix } from "../../libs/affine";
 import { useDisplay } from "../../stores/display";
 import { Rectangle, Vector } from "../../types";
 import { ComponentWithProps } from "../../types/components";
@@ -16,36 +16,39 @@ const opacityForZoomLevel = (zoomLevel: number, scale: number) => {
   return (distanceForZoomLevel(zoomLevel) * scale - gridDm) / (gridDM - gridDm);
 }
 
-export const GridSubLayer: ComponentWithProps<{
+const GridSubLayer: ComponentWithProps<{
   zoomLevel: number;
   getViewRect: () => Rectangle;
+  scale: number;
+  affineFieldToTag: AffineMatrix;
+  affineTagToField: AffineMatrix;
 }> = (props) => {
   const {
     scale,
     affineFieldToTag,
     affineTagToField,
-  } = useDisplay();
+  } = props;
 
   const grids: JSX.Element[] = [];
   const rect = props.getViewRect();
 
   const gridDistance = useMemo(() => gridD0 * Math.pow(4, -props.zoomLevel), [props.zoomLevel]);
 
-  const rt0: Vector = rect.r0;
-  const rt1: Vector = rect.r1;
+  const viewR0Tag: Vector = rect.r0;
+  const viewR1Tag: Vector = rect.r1;
 
-  const rf0 = affineApply(affineTagToField, rt0);
-  const rf1 = affineApply(affineTagToField, rt1);
+  const viewR0Field = affineApply(affineTagToField, viewR0Tag);
+  const viewR1Field = affineApply(affineTagToField, viewR1Tag);
 
-  const xFMin = rf0.x;
-  const xFMax = rf1.x;
-  const yFMin = rf0.y;
-  const yFMax = rf1.y;
+  const xFieldMin = viewR0Field.x;
+  const xFieldMax = viewR1Field.x;
+  const yFieldMin = viewR0Field.y;
+  const yFieldMax = viewR1Field.y;
 
-  const nXGridMin = Math.ceil(xFMin / gridDistance);
-  const nXGridMax = Math.floor(xFMax / gridDistance);
-  const nYGridMin = Math.ceil(yFMin / gridDistance);
-  const nYGridMax = Math.floor(yFMax / gridDistance);
+  const nXGridMin = Math.ceil(xFieldMin / gridDistance);
+  const nXGridMax = Math.floor(xFieldMax / gridDistance);
+  const nYGridMin = Math.ceil(yFieldMin / gridDistance);
+  const nYGridMax = Math.floor(yFieldMax / gridDistance);
 
   const opacity = useMemo(() => Math.min(opacityForZoomLevel(props.zoomLevel, scale), 1), [props.zoomLevel, scale]);
 
@@ -55,10 +58,8 @@ export const GridSubLayer: ComponentWithProps<{
     const vt = affineApply(affineFieldToTag, vf);
     grids.push(<line
       key={`x_${i}`}
-      x1={vt.x} y1={rt0.y}
-      x2={vt.x} y2={rt1.y}
-      strokeWidth="0.25"
-      opacity={opacity}
+      x1={vt.x} y1={viewR0Tag.y}
+      x2={vt.x} y2={viewR1Tag.y}
     />)
   }
 
@@ -68,15 +69,15 @@ export const GridSubLayer: ComponentWithProps<{
     const vt = affineApply(affineFieldToTag, vf);
     grids.push(<line
       key={`y_${i}`}
-      x1={rt0.x} y1={vt.y}
-      x2={rt1.x} y2={vt.y}
-      strokeWidth="0.25"
-      opacity={opacity}
+      x1={viewR0Tag.x} y1={vt.y}
+      x2={viewR1Tag.x} y2={vt.y}
     />)
   }
 
   return (
-    <>{grids}</>
+    <g className="grid-overlay" opacity={opacity} strokeWidth={0.25}>
+      {grids}
+    </g>
   )
 };
 
@@ -85,16 +86,21 @@ export const GridOverlay: ComponentWithProps<{
 }> = (props) => {
   const {
     scale,
+    affineFieldToTag,
+    affineTagToField,
   } = useDisplay();
   const zoomLevelMin = useMemo(() => Math.floor(Math.log2(scale * gridD0 / gridDM) / 2 - 1), [scale]);
   const zoomLevelMax = useMemo(() => Math.floor(Math.log2(scale * gridD0 / gridDm) / 2), [scale]);
-  return <g className="grid-overlay">
+  return <>
     {
       Array.from({ length: zoomLevelMax - zoomLevelMin + 1 }, (_, i) => i + zoomLevelMin).map(zoomLevel => <GridSubLayer
         key={zoomLevel}
         zoomLevel={zoomLevel}
         getViewRect={props.getViewRect}
+        scale={scale}
+        affineFieldToTag={affineFieldToTag}
+        affineTagToField={affineTagToField}
       />)
     }
-  </g>
+  </>
 }

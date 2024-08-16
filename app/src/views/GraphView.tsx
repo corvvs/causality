@@ -199,7 +199,7 @@ export const GraphView = () => {
     onPinchZoom: (e) => {
       if (!svgRef.current) { return; }
       const center: Vector = { x: e.clientX, y: e.clientY };
-      const deltaMag = e.deltaY > 0 ? -0.02 : 0.018;
+      const deltaMag = e.deltaY > 0 ? -0.009 : 0.008;
       changeScale(display.magnitude + deltaMag, center);
     },
     onPinchScroll: (e) => {

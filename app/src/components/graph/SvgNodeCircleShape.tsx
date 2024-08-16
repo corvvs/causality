@@ -18,7 +18,7 @@ export const SvgNodeCircleSelectedShape: ComponentWithProps<{ node: CircleNode }
     affineFieldToTag,
   } = useDisplay();
 
-  const margin = 0;
+  const margin = node.shape.line.lineWidth;
 
   const x0 = node.position.x;
   const y0 = node.position.y;

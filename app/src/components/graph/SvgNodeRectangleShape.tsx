@@ -68,7 +68,7 @@ export const SvgNodeRectangleSelectedShape: ComponentWithProps<{ node: Rectangle
 
     {centers1.map((rs) => <rect
       key={rs.type}
-      className={`${resizerCursor[rs.type]} stroke-transparent fill-transparent`}
+      className={`resizer-edge ${resizerCursor[rs.type]} stroke-transparent fill-transparent`}
       x={rs.center.x - rs.size.width / 2} y={rs.center.y - rs.size.height / 2}
       width={rs.size.width} height={rs.size.height}
       onMouseDown={(e) => {
@@ -83,7 +83,7 @@ export const SvgNodeRectangleSelectedShape: ComponentWithProps<{ node: Rectangle
 
     {centers2.map((rs) => <rect
       key={rs.type}
-      className={`${resizerCursor[rs.type]} stroke-1 hover:fill-blue-400`}
+      className={`resizer-corner ${resizerCursor[rs.type]} stroke-1 hover:fill-blue-400`}
       x={rs.center.x - rs.size.width / 2} y={rs.center.y - rs.size.height / 2}
       width={rs.size.width} height={rs.size.height}
       onMouseDown={(e) => {

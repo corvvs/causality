@@ -159,6 +159,18 @@ rect {
   background-color: var(--background-secondary);
 }
 
+
+.resizer-corner {
+  fill: var(--background);
+}
+
+.color-picker {
+  .color-picker-palette {
+    border-width: 0.1rem;
+    border-color: var(--foreground)
+  }
+}
+
 textarea,
 input[type="text"] {
   color: var(--foreground);

@@ -15,7 +15,7 @@ export const SvgNodeInnterText: ComponentWithProps<{ node: RectangleNode }> = (p
       className="w-full h-full flex flex-col justify-center items-center text-xs"
     >
       <p style={{
-        color: node.labelColor,
+        ...(node.labelColor ? { color: node.labelColor } : {}),
       }}>{node.id}</p>
       {node.label && <p>{node.label}</p>}
     </div>

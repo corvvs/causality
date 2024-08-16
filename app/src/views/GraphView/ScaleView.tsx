@@ -37,7 +37,7 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     });
   };
 
-  return <div className="system-box border-2 bg-black/50 grid grid-flow-col grid-rows-1 items-center">
+  return <div className="system-box border-2 grid grid-flow-col grid-rows-1 items-center">
     <p className="w-20">
       {Math.floor(scale * 100 + 0.5)}%
     </p>

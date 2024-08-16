@@ -4,6 +4,8 @@ import { easing } from "../../libs/easing";
 import { useDisplay } from "../../stores/display";
 import { Vector } from "../../types";
 import { ComponentWithProps } from "../../types/components";
+import { VscZoomIn, VscZoomOut } from 'react-icons/vsc';
+import { InlineIcon } from "../../components/InlineIcon";
 
 export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
   getCenter
@@ -12,8 +14,6 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     display,
     scale,
     changeScale,
-    scaleMin,
-    scaleMax,
   } = useDisplay();
 
   const {
@@ -37,23 +37,23 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     });
   };
 
-  return <div className="system-box border-2 bg-black/50">
-    <input type="range" min={scaleMin} max={scaleMax} step="0.001" value={display.magnitude} onChange={(e) => {
-      const center = getCenter();
-      if (!center) { return; }
-      changeScale(parseFloat(e.target.value), center);
-      e.stopPropagation();
-    }} />
-    <p>{Math.floor(scale * 100 + 0.5)}%</p>
+  return <div className="system-box border-2 bg-black/50 grid grid-flow-col grid-rows-1 items-center">
+    <p className="w-20">
+      {Math.floor(scale * 100 + 0.5)}%
+    </p>
     <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, display.magnitude - 0.25);
-    }}>-</Button>
+    }}>
+      <InlineIcon i={<VscZoomOut />} />
+    </Button>
     <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, 0);
     }}>reset</Button>
     <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, display.magnitude + 0.25);
-    }}>+</Button>
+    }}>
+      <InlineIcon i={<VscZoomIn />} />
+    </Button>
   </div>
 
 };

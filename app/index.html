@@ -2,6 +2,12 @@
 <html lang="en">
 
 <head>
+  <script>
+    const theme = localStorage.getItem('colorTheme');
+    if (theme) {
+      document.documentElement.dataset.theme = theme;
+    }
+  </script>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <link href="./src/output.css" rel="stylesheet">

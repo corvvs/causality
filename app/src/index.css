@@ -136,7 +136,6 @@ ellipse {
 }
 
 .ce-button {
-  background-color: var(--background);
   padding: 0.25rem 1rem;
 
   &:hover {
@@ -160,6 +159,41 @@ ellipse {
   background-color: var(--background-secondary);
 }
 
+.basic-palette {
+  position: absolute;
+  left: 1rem;
+  top: 20%;
+  border-color: none;
+  color: var(--background);
+  background-color: var(--foreground);
+  border-radius: 0.25rem;
+
+  .basic-palette-button {
+    border-radius: 0.25rem;
+
+    &:hover {
+      background-color: var(--foreground-secondary);
+    }
+  }
+}
+
+.basic-palette-subpanel {
+  color: var(--background);
+  background-color: var(--foreground);
+  border-radius: 0.25rem;
+
+  button {
+    &:hover {
+      color: var(--foreground);
+      background-color: var(--background);
+    }
+  }
+}
+
+.node-palette {
+  border-width: 0.25rem;
+  border-color: royalblue;
+}
 
 .resizer-corner {
   fill: var(--background);
@@ -194,6 +228,8 @@ input[type="text"] {
   padding: 0;
 
   background-color: var(--background);
+  border-radius: 0.25rem;
+  overflow: hidden;
 
   .multiple-buttons-button {
     z-index: 1;

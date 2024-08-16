@@ -1,4 +1,4 @@
-import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
+import { MdOutlineDarkMode, MdOutlineLightbulb, MdOutlineLightMode } from "react-icons/md";
 import { useColorTheme } from "../stores/theme";
 import { MultipleButtons } from "./MultipleButtons";
 import { InlineIcon } from "./InlineIcon";
@@ -27,6 +27,7 @@ export const ThemeSelector = () => {
           content: <div
             className="h-[1.5rem]"
           >
+            <InlineIcon i={<MdOutlineLightbulb />} />
             <span className="p-1">Auto</span>
           </div>
         },

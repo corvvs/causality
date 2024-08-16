@@ -37,10 +37,7 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     });
   };
 
-  return <div className="system-box border-2 grid grid-flow-col grid-rows-1 items-center">
-    <p className="w-20">
-      {Math.floor(scale * 100 + 0.5)}%
-    </p>
+  return <div className="basic-palette-subpanel grid grid-flow-col grid-rows-1 items-center">
     <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, display.magnitude - 0.25);
     }}>
@@ -54,6 +51,9 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     }}>
       <InlineIcon i={<VscZoomIn />} />
     </Button>
+    <p className="w-20 p-2 text-center">
+      {Math.floor(scale * 100 + 0.5)}%
+    </p>
   </div>
 
 };

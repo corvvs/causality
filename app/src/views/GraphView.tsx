@@ -14,6 +14,10 @@ import { SystemView } from "./GraphView/SystemView";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { Button } from "@headlessui/react";
 import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
+import { InlineIcon } from "../components/InlineIcon";
+import { FaShapes } from "react-icons/fa";
+import { SlMagnifier } from "react-icons/sl";
+import { BasicPalette } from "../components/palette/BasicPalette";
 
 function resizeRectangleLikeNode(props: {
   node: GraphNode;
@@ -436,6 +440,16 @@ export const GraphView = () => {
       </svg>
     </div>
 
+
+
+    <BasicPalette getCenter={() => {
+      if (!svgRef.current) { return { x: 0, y: 0 }; }
+      const svgRect = svgRef.current.getClientRects()[0];
+      const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+      return center;
+    }} />
+
+
     <div className="absolute flex flex-row items-center gap-4 left-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
@@ -464,16 +478,6 @@ export const GraphView = () => {
             }}
           >Add Circle</Button>
         </div>
-      </div>
-      <ScaleView getCenter={() => {
-        if (!svgRef.current) { return { x: 0, y: 0 }; }
-        const svgRect = svgRef.current.getClientRects()[0];
-        const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-        return center;
-      }} />
-
-      <div className="system-box border-2 p-2">
-        <ThemeSelector />
       </div>
 
     </div>

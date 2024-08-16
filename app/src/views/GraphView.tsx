@@ -15,9 +15,7 @@ import { ThemeSelector } from "../components/ThemeSelector";
 import { Button } from "@headlessui/react";
 import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
 
-
-
-function resizeNode(props: {
+function resizeRectangleLikeNode(props: {
   node: GraphNode;
   rx: number;
   ry: number;
@@ -238,7 +236,7 @@ export const GraphView = () => {
         case "nodeResizer": {
           const n = graph.nodes[draggingInfo.nodeId];
           if (!n) { return; }
-          resizeNode({
+          resizeRectangleLikeNode({
             node: n, rx, ry, scale, draggingInfo, updateNode, modifierKey
           });
           break;

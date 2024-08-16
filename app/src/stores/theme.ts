@@ -52,3 +52,31 @@ export const useColorTheme = () => {
     saveTheme,
   };
 }
+
+export const useColorThemeObserver = () => {
+  const {
+    loadTheme,
+    setAppColorTheme,
+    setPreferredColorTheme,
+  } = useColorTheme();
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const theme = mediaQuery.matches ? 'dark' : 'light';
+      console.log("theme", theme);
+      setPreferredColorTheme(theme);
+    };
+    handler();
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [setPreferredColorTheme]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') { return; }
+    const theme: ColorTheme = loadTheme() || "system";
+    console.log("setting", theme);
+    setAppColorTheme(theme);
+  }, [loadTheme, setAppColorTheme]);
+};

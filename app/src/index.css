@@ -227,7 +227,10 @@ input[type="text"] {
   row-gap: 0;
   padding: 0;
 
-  background-color: var(--background);
+  border-width: 0.25rem;
+  border-color: var(--foreground);
+  background-color: var(--foreground);
+  /* background-color: var(--background); */
   border-radius: 0.25rem;
   overflow: hidden;
 
@@ -235,17 +238,21 @@ input[type="text"] {
     z-index: 1;
     padding: 0.15rem 0.40rem;
     height: 2rem;
-    color: var(--foreground);
+    color: var(--background);
+    /* color: var(--foreground); */
 
     &:hover {
-      color: var(--background);
+      color: var(--foreground);
+      /* color: var(--background); */
       transition: color var(--flippable-transition);
       transition: background-color var(--flippable-transition);
     }
 
     &.active {
-      color: var(--background);
-      background-color: var(--foreground);
+      color: var(--foreground);
+      background-color: var(--background);
+      /* color: var(--background);
+      background-color: var(--foreground); */
       text-decoration: underline;
     }
   }
@@ -257,7 +264,8 @@ input[type="text"] {
   height: 100%;
   padding: 0.15rem 0.40rem;
   pointer-events: none;
-  background-color: var(--foreground);
+  background-color: var(--background);
+  /* background-color: var(--foreground); */
 }
 
 

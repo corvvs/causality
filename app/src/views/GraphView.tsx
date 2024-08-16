@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
-import { Vector } from "../types";
+import { GraphNode, Vector } from "../types";
 import { useOnPinch, useRerenderOnResize } from "../hooks/events";
 import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
@@ -13,6 +13,168 @@ import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { Button } from "@headlessui/react";
+import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
+
+
+
+function resizeNode(props: {
+  node: GraphNode;
+  rx: number;
+  ry: number;
+  scale: number;
+  draggingInfo: DraggingInfo;
+  modifierKey: MyModifierKey
+  updateNode: (nodeId: number, node: Partial<GraphNode>) => void;
+}) {
+  const {
+    node: n,
+    rx, ry, scale,
+    draggingInfo,
+    updateNode,
+    modifierKey,
+  } = props;
+  if (draggingInfo.target !== "nodeResizer") { return; }
+  if (!draggingInfo.origin) { return; }
+  const xTo = rx / scale;
+  const yTo = ry / scale;
+  switch (draggingInfo.resizerType) {
+    case "N": {
+      const yFrom = n.position.y + n.size.height;
+      let w = n.size.width;
+      let h = yFrom - yTo
+      if (modifierKey.shift) {
+        w = h;
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dw = w - n.size.width;
+      const dh = h - n.size.height;
+      updateNode(n.id, {
+        position: { x: n.position.x - dw / 2, y: n.position.y - dh },
+        size: { width: w, height: h }
+      });
+      break;
+    }
+    case "E": {
+      let w = xTo - n.position.x;
+      let h = n.size.height;
+      if (modifierKey.shift) {
+        h = w;
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dh = h - n.size.height;
+      updateNode(n.id, {
+        position: { x: n.position.x, y: n.position.y - dh / 2 },
+        size: { width: w, height: h },
+      });
+      break;
+    }
+    case "S": {
+      let w = n.size.width;
+      let h = yTo - n.position.y;
+      if (modifierKey.shift) {
+        w = h;
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dw = w - n.size.width;
+      updateNode(n.id, {
+        position: { x: n.position.x - dw / 2, y: n.position.y },
+        size: { width: w, height: h }
+      });
+      break;
+    }
+    case "W": {
+      const xFrom = n.position.x + n.size.width;
+      let w = xFrom - xTo
+      let h = n.size.height;
+      if (modifierKey.shift) {
+        h = w;
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dw = w - n.size.width;
+      const dh = h - n.size.height;
+      updateNode(n.id, {
+        position: { x: n.position.x - dw, y: n.position.y - dh / 2 },
+        size: { width: w, height: h }
+      });
+      break;
+    }
+    case "NW": {
+      const xFrom = n.position.x + n.size.width;
+      const yFrom = n.position.y + n.size.height;
+      let w = xFrom - xTo;
+      let h = yFrom - yTo
+      if (modifierKey.shift) {
+        if (w > h) { h = w; }
+        if (h > w) { w = h; }
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dw = w - n.size.width;
+      const dh = h - n.size.height;
+      updateNode(n.id, {
+        position: { x: n.position.x - dw, y: n.position.y - dh },
+        size: { width: w, height: h }
+      });
+      break;
+    }
+    case "NE": {
+      let w = xTo - n.position.x;
+      let h = n.size.height - (yTo - n.position.y);
+      if (modifierKey.shift) {
+        if (w > h) { h = w; }
+        if (h > w) { w = h; }
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dh = h - n.size.height;
+      updateNode(n.id, {
+        position: { x: n.position.x, y: n.position.y - dh },
+        size: { width: w, height: h }
+      });
+      break;
+    }
+    case "SW": {
+      let w = n.size.width - (xTo - n.position.x);
+      let h = yTo - n.position.y;
+      if (modifierKey.shift) {
+        if (w > h) { h = w; }
+        if (h > w) { w = h; }
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      const dw = w - n.size.width;
+      updateNode(n.id, {
+        position: { x: n.position.x - dw, y: n.position.y },
+        size: { width: w, height: h }
+      });
+      break;
+    }
+    case "SE": {
+      let w = xTo - n.position.x;
+      let h = yTo - n.position.y;
+      if (modifierKey.shift) {
+        if (w > h) { h = w; }
+        if (h > w) { w = h; }
+      }
+      if (w < 0) { w = 0; }
+      if (h < 0) { h = 0; }
+      if (w <= 0 && h <= 0) { return; }
+      updateNode(n.id, { size: { width: w, height: h } });
+      break;
+    }
+  }
+}
 
 export const GraphView = () => {
   const {
@@ -29,6 +191,10 @@ export const GraphView = () => {
     transformFieldToBrowser,
     affineTagToField,
   } = useDisplay();
+
+  const {
+    modifierKey,
+  } = useModifierKey();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
   useRerenderOnResize(svgRef);
@@ -50,16 +216,21 @@ export const GraphView = () => {
 
   useEffect(() => {
     window.requestAnimationFrame
-    const handleMouseMove = (event: any) => {
+    const handleMouseMove = (event: MouseEvent) => {
       if (!draggingInfo.target) { return; }
       if (!draggingInfo.origin) { return; }
+
+      const cx = event.clientX;
+      const cy = event.clientY;
+      const rx = cx - draggingInfo.origin.x;
+      const ry = cy - draggingInfo.origin.y;
 
       switch (draggingInfo.target) {
         case "node": {
           const n = graph.nodes[draggingInfo.nodeId];
           if (!n) { return; }
-          const xTo = (event.clientX - draggingInfo.origin.x) / scale;
-          const yTo = (event.clientY - draggingInfo.origin.y) / scale;
+          const xTo = rx / scale;
+          const yTo = ry / scale;
           const positionTo = { x: xTo, y: yTo };
           updateNode(n.id, { position: positionTo });
           break;
@@ -67,90 +238,14 @@ export const GraphView = () => {
         case "nodeResizer": {
           const n = graph.nodes[draggingInfo.nodeId];
           if (!n) { return; }
-          const xTo = (event.clientX - draggingInfo.origin.x) / scale;
-          const yTo = (event.clientY - draggingInfo.origin.y) / scale;
-          switch (draggingInfo.resizerType) {
-            case "N": {
-              const yFrom = n.position.y + n.size.height;
-              const h = yFrom - yTo
-              if (h <= 0) { return; }
-              updateNode(n.id, {
-                position: { x: n.position.x, y: yTo },
-                size: { width: n.size.width, height: h }
-              });
-              break;
-            }
-            case "E": {
-              const w = xTo - n.position.x;
-              if (w <= 0) { return; }
-              updateNode(n.id, {
-                size: { width: w, height: n.size.height }
-              });
-              break;
-            }
-            case "S": {
-              const h = yTo - n.position.y;
-              if (h <= 0) { return; }
-              updateNode(n.id, {
-                size: { width: n.size.width, height: h }
-              });
-              break;
-            }
-            case "W": {
-              const xFrom = n.position.x + n.size.width;
-              const w = xFrom - xTo
-              if (w <= 0) { return; }
-              updateNode(n.id, {
-                position: { x: xTo, y: n.position.y },
-                size: { width: w, height: n.size.height }
-              });
-              break;
-            }
-            case "NW": {
-              const xFrom = n.position.x + n.size.width;
-              const yFrom = n.position.y + n.size.height;
-              const w = xFrom - xTo;
-              const h = yFrom - yTo
-              if (w <= 0 || h <= 0) { return; }
-              updateNode(n.id, {
-                position: { x: xTo, y: yTo },
-                size: { width: w, height: h }
-              });
-              break;
-            }
-            case "NE": {
-              const w = xTo - n.position.x;
-              const h = n.size.height - (yTo - n.position.y);
-              if (w <= 0 || h <= 0) { return; }
-              updateNode(n.id, {
-                position: { x: n.position.x, y: yTo },
-                size: { width: w, height: h }
-              });
-              break;
-            }
-            case "SW": {
-              const w = n.size.width - (xTo - n.position.x);
-              const h = yTo - n.position.y;
-              if (w <= 0 || h <= 0) { return; }
-              updateNode(n.id, {
-                position: { x: xTo, y: n.position.y },
-                size: { width: w, height: h }
-              });
-              break;
-            }
-            case "SE": {
-              const w = xTo - n.position.x;
-              const h = yTo - n.position.y;
-              if (w <= 0 || h <= 0) { return; }
-              updateNode(n.id, { size: { width: w, height: h } });
-              break;
-            }
-          }
+          resizeNode({
+            node: n, rx, ry, scale, draggingInfo, updateNode, modifierKey
+          });
           break;
         }
         case "field": {
-          const dx = event.clientX - draggingInfo.origin.x;
-          const dy = event.clientY - draggingInfo.origin.y;
+          const dx = cx - draggingInfo.origin.x;
+          const dy = cy - draggingInfo.origin.y;
           moveOrigin(dx, dy);
           break;
         }
@@ -173,11 +268,13 @@ export const GraphView = () => {
       }
 
     };
-    const handleMouseDown = (event: any) => {
+    const handleMouseDown = (event: MouseEvent) => {
       if (draggingInfo.target !== "field") { return; }
       // フィールド自体のドラッグを行う
-      const x = event.clientX - display.origin.x;
-      const y = event.clientY - display.origin.y;
+      const cx = event.clientX;
+      const cy = event.clientY;
+      const x = cx - display.origin.x;
+      const y = cy - display.origin.y;
       setDraggingInfo({
         target: "field",
         origin: { x, y },
@@ -264,6 +361,7 @@ export const GraphView = () => {
               setDraggingInfo({
                 ...draggableMatter,
                 origin: { x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale, },
+                size: node.size,
               });
             }}
           />

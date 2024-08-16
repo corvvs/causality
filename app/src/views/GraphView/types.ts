@@ -29,4 +29,5 @@ export type DraggingInfo = {
   target: null;
 } | (DraggableMatter & {
   origin: Vector;
+  size?: Size;
 });

@@ -1,7 +1,6 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { useGraph } from "../../stores/graph";
 import { NodeSelection } from "./types";
-import { useState } from "react";
 import { ColorValue } from "../../types";
 import { ColorPicker } from "../../components/ColorPicker";
 
@@ -16,7 +15,7 @@ export const NodeEditView = (props: {
   } = useGraph();
   const node = graph.nodes[firstId];
 
-  const color = node.labelColor;
+  const color = node.labelColor || null;
   const setColor = (v: ColorValue | null) => {
     updateNode(firstId, {
       labelColor: v || undefined,

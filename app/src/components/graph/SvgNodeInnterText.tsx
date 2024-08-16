@@ -1,7 +1,7 @@
-import { RectangleNode } from "../../types";
+import { GraphNode } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 
-export const SvgNodeInnterText: ComponentWithProps<{ node: RectangleNode }> = (props) => {
+export const SvgNodeInnterText: ComponentWithProps<{ node: GraphNode }> = (props) => {
   const { node } = props;
   return <foreignObject
     x="0" y="0"

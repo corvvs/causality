@@ -4,16 +4,16 @@ import { Vector } from "../../types";
 export type DraggingTarget = "node" | "field" | null;
 
 export type NodeSelection = {
-  ids: string[];
-  set: { [nodeId: string]: boolean; }
+  ids: number[];
+  set: { [nodeId: number]: boolean; }
 };
 
 export type DraggableMatter = {
   target: "node";
-  nodeId: string;
+  nodeId: number;
 } | {
   target: "nodeResizer";
-  nodeId: string;
+  nodeId: number;
   resizerType: ResizerType;
 } | {
   target: "field";

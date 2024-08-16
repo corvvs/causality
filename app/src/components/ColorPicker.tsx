@@ -23,7 +23,7 @@ export const ColorPicker: ComponentWithProps<{
       {colorPalette.colors.map((color, i) => {
         return <button
           key={i}
-          className="color-picker-palette w-12 h-12 font-bold text-xs hover:shadow-md"
+          className="color-picker-palette rounded-full w-12 h-12 font-bold text-xs hover:shadow-md"
           style={{
             ...(color ? { backgroundColor: color } : {}),
             cursor: "pointer",

@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, GraphNode, RectangleNode, Vector } from "../types";
+import { CausalGraph, CircleNode, GraphNode, RectangleNode, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 
 const graphKey = "GRAPH";
@@ -12,13 +12,32 @@ const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
   edges: [],
 });
 
-const createDefaultNode = (index: number, position: Vector): RectangleNode => {
+const newRectNode = (index: number, position: Vector): RectangleNode => {
   return {
-    id: `node_${index}`,
+    id: index,
     position,
     z: index,
     label: "",
     nodeType: "Rectangle",
+    size: {
+      width: 100,
+      height: 100,
+    },
+    shape: {
+      line: {
+        lineWidth: 2,
+      },
+    },
+  }
+};
+
+const newCircleNode = (index: number, position: Vector): CircleNode => {
+  return {
+    id: index,
+    position,
+    z: index,
+    label: "",
+    nodeType: "Circle",
     size: {
       width: 100,
       height: 100,
@@ -39,24 +58,42 @@ export const useGraph = () => {
    * 作成したノードを返す.
    * @returns 
    */
-  const newNode = (position: Vector) => {
+  const addRectNode = (position: Vector) => {
     const newIndex = graph.index + 1;
-    const newNode = createDefaultNode(newIndex, position);
+    const nn = newRectNode(newIndex, position);
     setGraph((prev) => {
       return {
         index: newIndex,
         nodes: {
           ...prev.nodes,
-          [newNode.id]: newNode,
+          [nn.id]: nn,
         },
-        nodeOrder: [...prev.nodeOrder, newNode.id],
+        nodeOrder: [...prev.nodeOrder, nn.id],
         edges: prev.edges,
       };
     });
-    return newNode;
+    return nn;
   };
 
-  const updateNode = (nodeId: string, node: Partial<GraphNode>) => {
+  const addCircleNode = (position: Vector) => {
+    const newIndex = graph.index + 1;
+    const nn = newCircleNode(newIndex, position);
+    setGraph((prev) => {
+      return {
+        index: newIndex,
+        nodes: {
+          ...prev.nodes,
+          [nn.id]: nn,
+        },
+        nodeOrder: [...prev.nodeOrder, nn.id],
+        edges: prev.edges,
+      };
+    });
+    return nn;
+  };
+
+
+  const updateNode = (nodeId: number, node: Partial<GraphNode>) => {
     const n = graph.nodes[nodeId];
     if (!n) { return; }
     setGraph((prev) => {
@@ -70,7 +107,7 @@ export const useGraph = () => {
     });
   };
 
-  const deleteNode = (nodeId: string) => {
+  const deleteNode = (nodeId: number) => {
     const nodeIndexToDelete = graph.nodeOrder.findIndex((n) => n === nodeId);
     if (nodeIndexToDelete < 0) {
       return;
@@ -89,7 +126,8 @@ export const useGraph = () => {
 
   return {
     graph,
-    newNode,
+    addRectNode,
+    addCircleNode,
     updateNode,
     deleteNode,
   };

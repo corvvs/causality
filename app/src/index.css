@@ -130,7 +130,8 @@ line {
   stroke: var(--foreground);
 }
 
-rect {
+rect,
+ellipse {
   stroke: var(--foreground);
 }
 
@@ -167,7 +168,11 @@ rect {
 .color-picker {
   .color-picker-palette {
     border-width: 0.1rem;
-    border-color: var(--foreground)
+    border-color: transparent;
+
+    &:hover {
+      border-color: var(--foreground);
+    }
   }
 }
 

@@ -16,7 +16,8 @@ import { Button } from "@headlessui/react";
 
 export const GraphView = () => {
   const {
-    newNode,
+    addRectNode,
+    addCircleNode,
     updateNode,
     graph,
   } = useGraph();
@@ -343,18 +344,31 @@ export const GraphView = () => {
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
 
-      <div className="system-box border-2">
-        <Button className="ce-button rounded text-lg"
-          onClick={() => {
-            if (!svgRef.current) { return null; }
-            const svgRect = svgRef.current.getClientRects()[0];
-            const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-            const tCenter = affineApply(affineTagToField, center);
-            newNode(tCenter);
-          }}
-        >Add Node</Button>
-      </div>
+      <div className="system-box border-2 grid grid-rows-2 grid-flow-row">
+        <div>
+          <Button className="ce-button rounded text-lg"
+            onClick={() => {
+              if (!svgRef.current) { return null; }
+              const svgRect = svgRef.current.getClientRects()[0];
+              const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+              const tCenter = affineApply(affineTagToField, center);
+              addRectNode(tCenter);
+            }}
+          >Add Rect</Button>
 
+        </div>
+        <div>
+          <Button className="ce-button rounded text-lg"
+            onClick={() => {
+              if (!svgRef.current) { return null; }
+              const svgRect = svgRef.current.getClientRects()[0];
+              const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+              const tCenter = affineApply(affineTagToField, center);
+              addCircleNode(tCenter);
+            }}
+          >Add Circle</Button>
+        </div>
+      </div>
       <ScaleView getCenter={() => {
         if (!svgRef.current) { return { x: 0, y: 0 }; }
         const svgRect = svgRef.current.getClientRects()[0];

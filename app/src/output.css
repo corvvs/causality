@@ -682,6 +682,10 @@ video {
   grid-template-rows: repeat(1, minmax(0, 1fr));
 }
 
+.grid-rows-2 {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -708,6 +712,10 @@ video {
 
 .rounded {
   border-radius: 0.25rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
 }
 
 .border-2 {
@@ -893,7 +901,8 @@ line {
   stroke: var(--foreground);
 }
 
-rect {
+rect,
+ellipse {
   stroke: var(--foreground);
 }
 
@@ -928,7 +937,10 @@ rect {
 .color-picker {
   .color-picker-palette {
     border-width: 0.1rem;
-    border-color: var(--foreground)
+    border-color: transparent;
+    &:hover {
+      border-color: var(--foreground);
+    }
   }
 }
 

@@ -22,7 +22,7 @@ type AppearanceFields = {
 };
 
 type GenericFields = {
-  id: string;
+  id: number;
   label: string | null;
 };
 
@@ -44,14 +44,13 @@ type RectangleShape = {
   line: LineShape;
 };
 
+type CircleShape = {
+  line: LineShape;
+};
+
 export type RectangleNode = GraphNode & {
   nodeType: "Rectangle";
   shape: RectangleShape;
-};
-
-type CircleShape = {
-  radius: number;
-  line: LineShape;
 };
 
 export type CircleNode = GraphNode & {
@@ -60,15 +59,15 @@ export type CircleNode = GraphNode & {
 };
 
 export type GraphEdge = GenericFields & {
-  startNodeId: string;
-  endNodeId: string;
+  startNodeId: number;
+  endNodeId: number;
   z: number;
 };
 
 export type CausalGraph = {
   index: number;
-  nodes: { [id: string]: GraphNode };
-  nodeOrder: string[];
+  nodes: { [id: number]: GraphNode };
+  nodeOrder: number[];
   edges: GraphEdge[];
 }
 

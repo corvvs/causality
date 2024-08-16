@@ -14,8 +14,15 @@ const deaultColorPalette: () => ColorPalette = () => ({
     "black",
     "white",
     "red",
+    "crimson",
+    "springgreen",
     "green",
+    "teal",
+    "orange",
+    "gold",
+    "royalblue",
     "blue",
+    "cyan",
   ],
 });
 

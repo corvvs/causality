@@ -7,10 +7,8 @@ import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
-import { affineApply } from "../libs/affine";
 import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
-import { Button } from "@headlessui/react";
 import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
 
@@ -175,8 +173,6 @@ function resizeRectangleLikeNode(props: {
 
 export const GraphView = () => {
   const {
-    addRectNode,
-    addCircleNode,
     updateNode,
     graph,
   } = useGraph();
@@ -186,7 +182,6 @@ export const GraphView = () => {
     moveOrigin,
     changeScale,
     transformFieldToBrowser,
-    affineTagToField,
   } = useDisplay();
 
   const {
@@ -443,39 +438,6 @@ export const GraphView = () => {
       const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
       return center;
     }} />
-
-
-    <div className="absolute flex flex-row items-center gap-4 left-0 p-4"
-      onMouseDown={(e) => { e.stopPropagation(); }}
-    >
-
-      <div className="system-box border-2 grid grid-rows-2 grid-flow-row">
-        <div>
-          <Button className="ce-button rounded text-lg"
-            onClick={() => {
-              if (!svgRef.current) { return null; }
-              const svgRect = svgRef.current.getClientRects()[0];
-              const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-              const tCenter = affineApply(affineTagToField, center);
-              addRectNode(tCenter);
-            }}
-          >Add Rect</Button>
-
-        </div>
-        <div>
-          <Button className="ce-button rounded text-lg"
-            onClick={() => {
-              if (!svgRef.current) { return null; }
-              const svgRect = svgRef.current.getClientRects()[0];
-              const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-              const tCenter = affineApply(affineTagToField, center);
-              addCircleNode(tCenter);
-            }}
-          >Add Circle</Button>
-        </div>
-      </div>
-
-    </div>
 
     {Object.keys(selectedNodes.ids).length === 1 && <div className="absolute right-0 top-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}

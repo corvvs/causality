@@ -43,7 +43,6 @@ export const ThemeSelector = () => {
       ]}
       onClick={(item) => {
         const theme = item.key;
-        console.log(`theme: ${theme}`);
         setAppColorTheme(theme)
         saveTheme(theme);
       }}

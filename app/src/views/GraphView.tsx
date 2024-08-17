@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
-import { GraphNode, Vector } from "../types";
+import { GraphNode, isGraphNode, Vector } from "../types";
 import { useOnPinch, useRerenderOnResize } from "../hooks/events";
 import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
@@ -219,8 +219,9 @@ export const GraphView = () => {
 
       switch (draggingInfo.target) {
         case "node": {
-          const n = graph.nodes[draggingInfo.nodeId];
+          const n = graph.shapeMap[draggingInfo.nodeId];
           if (!n) { return; }
+          if (!isGraphNode(n)) { return; }
           const xTo = rx / scale;
           const yTo = ry / scale;
           const positionTo = { x: xTo, y: yTo };
@@ -228,8 +229,9 @@ export const GraphView = () => {
           break;
         }
         case "nodeResizer": {
-          const n = graph.nodes[draggingInfo.nodeId];
+          const n = graph.shapeMap[draggingInfo.nodeId];
           if (!n) { return; }
+          if (!isGraphNode(n)) { return; }
           resizeRectangleLikeNode({
             node: n, rx, ry, scale, draggingInfo, updateNode, modifierKey
           });
@@ -320,7 +322,6 @@ export const GraphView = () => {
         className="h-full w-full"
         ref={svgRef}
         onClick={() => {
-          console.log("SVG ONCLICK");
           setSelectedNodes({ ids: [], set: {} });
         }}
       >
@@ -334,6 +335,7 @@ export const GraphView = () => {
         >
           <NodeGroup
             selectedNodes={selectedNodes}
+            graph={graph}
             click={(e, node) => {
               console.log(e)
               if (!selectedNodes.set[node.id]) {
@@ -349,7 +351,8 @@ export const GraphView = () => {
             mouseDown={(e, draggableMatter) => {
               if (draggingInfo.target === "node") { return; }
               if (draggableMatter.target !== "node") { return; }
-              const node = graph.nodes[draggableMatter.nodeId];
+              const node = graph.shapeMap[draggableMatter.nodeId];
+              if (!isGraphNode(node)) { return; }
               setDraggingInfo({
                 ...draggableMatter,
                 origin: { x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale, },
@@ -362,7 +365,8 @@ export const GraphView = () => {
           selectedNodes={selectedNodes}
           mouseDown={(e, draggableMatter) => {
             if (draggableMatter.target !== "nodeResizer") { return; }
-            const node = graph.nodes[draggableMatter.nodeId];
+            const node = graph.shapeMap[draggableMatter.nodeId];
+            if (!isGraphNode(node)) { return; }
             const x = node.position.x;
             const y = node.position.y;
             const w = node.size.width;

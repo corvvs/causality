@@ -13,7 +13,7 @@ export const NodeEditView = (props: {
     graph,
     updateNode,
   } = useGraph();
-  const node = graph.nodes[firstId];
+  const node = graph.shapeMap[firstId];
 
   const color = node.labelColor || null;
   const setColor = (v: ColorValue | null) => {

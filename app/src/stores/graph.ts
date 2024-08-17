@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphNode, RectangleNode, Vector } from "../types";
+import { CausalGraph, CircleNode, GraphEdge, GraphNode, NodeEdgeMap, RectangleNode, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 
 const graphKey = "GRAPH";
@@ -7,9 +7,10 @@ const graphProvider = localStorageProvider<CausalGraph>();
 
 const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
   index: 0,
-  nodes: {},
-  nodeOrder: [],
-  edges: [],
+  shapeMap: {},
+  orders: [],
+  forwardEdgeMap: {},
+  backwardEdgeMap: {},
 });
 
 const newRectNode = (index: number, position: Vector): RectangleNode => {
@@ -18,7 +19,7 @@ const newRectNode = (index: number, position: Vector): RectangleNode => {
     position,
     z: index,
     label: "",
-    nodeType: "Rectangle",
+    shapeType: "Rectangle",
     size: {
       width: 100,
       height: 100,
@@ -37,7 +38,7 @@ const newCircleNode = (index: number, position: Vector): CircleNode => {
     position,
     z: index,
     label: "",
-    nodeType: "Circle",
+    shapeType: "Circle",
     size: {
       width: 100,
       height: 100,
@@ -64,12 +65,13 @@ export const useGraph = () => {
     setGraph((prev) => {
       return {
         index: newIndex,
-        nodes: {
-          ...prev.nodes,
+        shapeMap: {
+          ...prev.shapeMap,
           [nn.id]: nn,
         },
-        nodeOrder: [...prev.nodeOrder, nn.id],
-        edges: prev.edges,
+        orders: [...prev.orders, nn.id],
+        forwardEdgeMap: prev.forwardEdgeMap,
+        backwardEdgeMap: prev.backwardEdgeMap,
       };
     });
     return nn;
@@ -81,45 +83,67 @@ export const useGraph = () => {
     setGraph((prev) => {
       return {
         index: newIndex,
-        nodes: {
-          ...prev.nodes,
+        shapeMap: {
+          ...prev.shapeMap,
           [nn.id]: nn,
         },
-        nodeOrder: [...prev.nodeOrder, nn.id],
-        edges: prev.edges,
+        orders: [...prev.orders, nn.id],
+        forwardEdgeMap: prev.forwardEdgeMap,
+        backwardEdgeMap: prev.backwardEdgeMap,
       };
     });
     return nn;
   };
 
-
-  const updateNode = (nodeId: number, node: Partial<GraphNode>) => {
-    const n = graph.nodes[nodeId];
-    if (!n) { return; }
+  /**
+   * 2つのノードを結ぶエッジを作成する
+   * @param startNodeId 
+   * @param endNodeId 
+   */
+  const linkUpNodes = (startNodeId: number, endNodeId: number) => {
+    if (startNodeId === endNodeId) {
+      console.warn("Cannot link a node to itself");
+      return;
+    }
+    const newIndex = graph.index + 1;
+    const edge: GraphEdge = {
+      id: newIndex,
+      shapeType: "Edge",
+      label: "",
+      startNodeId,
+      endNodeId,
+      z: newIndex,
+    };
     setGraph((prev) => {
+      const idPairFT = `${edge.startNodeId}-${edge.endNodeId}`;
+      const idPairTF = `${edge.endNodeId}-${edge.startNodeId}`;
+      const forwardEdgeMap: NodeEdgeMap = { ...prev.forwardEdgeMap, [idPairFT]: prev.forwardEdgeMap[idPairFT] || [] };
+      const backwardEdgeMap: NodeEdgeMap = { ...prev.backwardEdgeMap, [idPairTF]: prev.backwardEdgeMap[idPairTF] || [] };
+      forwardEdgeMap[idPairFT].push(edge.id);
+      backwardEdgeMap[idPairTF].push(edge.id);
+
       return {
-        ...prev,
-        nodes: {
-          ...prev.nodes,
-          [nodeId]: { ...n, ...node },
-        },
+        index: newIndex,
+        shapeMap: { ...prev.shapeMap, [edge.id]: edge },
+        orders: [...prev.orders, edge.id],
+        forwardEdgeMap,
+        backwardEdgeMap,
       };
     });
   };
 
-  const deleteNode = (nodeId: number) => {
-    const nodeIndexToDelete = graph.nodeOrder.findIndex((n) => n === nodeId);
-    if (nodeIndexToDelete < 0) {
-      return;
-    }
-    const newNodes = { ...graph.nodes };
-    delete newNodes[nodeId];
+
+  const updateNode = (nodeId: number, node: Partial<GraphNode>) => {
+    const n = graph.shapeMap[nodeId];
+    if (!n) { return; }
+    const newNode = { ...n, ...node };
     setGraph((prev) => {
       return {
         ...prev,
-        nodes: newNodes,
-        nodeOrder: prev.nodeOrder.filter((n) => n !== nodeId),
-        edges: prev.edges.filter((e) => e.startNodeId !== nodeId && e.endNodeId !== nodeId),
+        shapeMap: {
+          ...prev.shapeMap,
+          [nodeId]: newNode,
+        },
       };
     });
   };
@@ -129,7 +153,7 @@ export const useGraph = () => {
     addRectNode,
     addCircleNode,
     updateNode,
-    deleteNode,
+    linkUpNodes,
   };
 };
 

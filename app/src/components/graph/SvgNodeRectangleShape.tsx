@@ -7,7 +7,7 @@ import { CommonProps } from "./types";
 export const SvgNodeRectangleSelectedShape = SvgNodeRectangleLikeSelectedShape;
 
 export const SvgNodeRectangleShape: ComponentWithProps<CommonProps<RectangleNode> & DraggableProps & SelectiveProps> = (props) => {
-  const { node } = props;
+  const { shape: node } = props;
 
   const basePosition = node.position;
   const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;

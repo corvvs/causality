@@ -1,6 +1,7 @@
-import { GraphNode } from "../../types";
+import { CausalGraph, GraphShape } from "../../types";
 
-export type CommonProps<N extends GraphNode> = {
-  node: N;
+export type CommonProps<N extends GraphShape> = {
+  shape: N;
   isSelected: boolean;
+  graph: CausalGraph;
 };

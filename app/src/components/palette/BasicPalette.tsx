@@ -12,6 +12,7 @@ import { TbCircle, TbSquare, TbSquares } from "react-icons/tb"
 import { useDisplay } from "../../stores/display"
 import { affineApply } from "../../libs/affine"
 import { useGraph } from "../../stores/graph"
+import { GoArrowUpRight } from "react-icons/go"
 
 const getIconTypeForColorTheme = (colorTheme: ColorTheme) => {
   switch (colorTheme) {
@@ -37,14 +38,16 @@ export const BasicPalette: ComponentWithProps<{
   } = useDisplay();
 
   const {
+    graph,
     addRectNode,
     addCircleNode,
+    linkUpNodes,
   } = useGraph();
 
   const IconTypeForColorTheme = getIconTypeForColorTheme(appColorTheme);
 
   return <div className="basic-palette">
-    <div className="grid grid-cols-1 grid-flow-row gap-2 p-1 pb-2">
+    <div className="grid grid-cols-1 grid-flow-row gap-2 p-1 pb-4">
       <div>
         <Popover className="relative">
           <PopoverButton as="div">
@@ -87,6 +90,22 @@ export const BasicPalette: ComponentWithProps<{
             />
           </PopoverPanel>
         </Popover>
+      </div>
+
+      <div>
+        <Button
+          className="basic-palette-button p-1"
+          onClick={() => {
+            const nodeOrders = graph.orders.filter(id => graph.shapeMap[id].shapeType !== "Edge");
+            if (nodeOrders.length < 2) { return; }
+            const a = graph.shapeMap[nodeOrders[0]];
+            const b = graph.shapeMap[nodeOrders[1]];
+            console.log(a, b);
+            linkUpNodes(a.id, b.id);
+          }}
+        >
+          <InlineIcon i={<GoArrowUpRight className="w-6 h-6" />} />
+        </Button>
       </div>
 
       <div>

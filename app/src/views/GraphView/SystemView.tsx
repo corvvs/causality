@@ -20,7 +20,7 @@ export const SystemView = (props: {
   const scale = Math.pow(10, display.magnitude);
   return <div className="system-box p-4 gap-4 flex flex-col border-2 text-xs text-left">
     <p>
-      nodes: {graph.nodeOrder.length}
+      nodes: {graph.orders.length}
     </p>
     <p>
       display.origin: {sprintf("(%1.2f, %1.2f)", display.origin.x, display.origin.y)}

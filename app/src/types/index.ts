@@ -33,19 +33,31 @@ type LineShape = {
   lineWidth: number;
 };
 
-export type GraphNode = GenericFields & AppearanceFields & {
-  nodeType: string;
-  position: Vector;
-  size: Size;
+type NodeShapeType = "Rectangle" | "Circle";
+type ShapeType = NodeShapeType | "Edge";
+type ShapeId = number;
+
+
+export type GraphShape = GenericFields & AppearanceFields & {
+  shapeType: ShapeType;
   z: number;
 };
+
+export type GraphNode = GraphShape & {
+  shapeType: NodeShapeType;
+  position: Vector;
+  size: Size;
+};
+
+export function isGraphNode(shape: GraphShape): shape is GraphNode {
+  return shape.shapeType === "Rectangle" || shape.shapeType === "Circle";
+}
 
 type RectangleLikeShape = {
   line: LineShape;
 };
 
 type RectangleShape = RectangleLikeShape;
-
 type CircleShape = RectangleLikeShape;
 
 export type RectangleLikeNode = GraphNode & {
@@ -53,26 +65,32 @@ export type RectangleLikeNode = GraphNode & {
 }
 
 export type RectangleNode = GraphNode & {
-  nodeType: "Rectangle";
+  shapeType: "Rectangle";
   shape: RectangleShape;
 };
 
 export type CircleNode = GraphNode & {
-  nodeType: "Circle";
+  shapeType: "Circle";
   shape: CircleShape;
 };
 
-export type GraphEdge = GenericFields & {
-  startNodeId: number;
-  endNodeId: number;
+export type GraphEdge = GraphShape & {
+  shapeType: "Edge";
+  startNodeId: ShapeId;
+  endNodeId: ShapeId;
   z: number;
+};
+
+export type NodeEdgeMap = {
+  [id_pair: string]: ShapeId[];
 };
 
 export type CausalGraph = {
   index: number;
-  nodes: { [id: number]: GraphNode };
-  nodeOrder: number[];
-  edges: GraphEdge[];
+  shapeMap: { [id: ShapeId]: GraphShape };
+  orders: ShapeId[];
+  forwardEdgeMap: NodeEdgeMap;
+  backwardEdgeMap: NodeEdgeMap;
 }
 
 export type CausalDisplay = {

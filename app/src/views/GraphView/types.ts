@@ -41,6 +41,9 @@ export type DraggableMatter = {
   target: "node";
   nodeId: number;
 } | {
+  target: "segment";
+  segmentId: number;
+} | {
   target: "reshaper";
   nodeId: number;
   resizerType: ReshaperType;

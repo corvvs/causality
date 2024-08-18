@@ -18,7 +18,7 @@ export const SystemView = (props: {
     appColorTheme,
   } = useColorTheme();
   const scale = Math.pow(10, display.magnitude);
-  return <div className="system-box p-4 gap-4 flex flex-col border-2 text-xs text-left">
+  return <div className="system-box p-4 gap-4 flex flex-col border-2 text-xs text-left pointer-events-none select-none">
     <p>
       nodes: {graph.orders.length}
     </p>

@@ -11,7 +11,7 @@ import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
 import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
-import { positionForBond } from "../components/graph/SvgSegmentShape";
+import { getPositionForBond, isFullyBonded, isFullyFree } from "../libs/segment";
 
 function reshapeRectangleLikeNode(props: {
   shape: GraphNode;
@@ -269,6 +269,23 @@ export const GraphView = () => {
           updateNode(n.id, { position: positionTo });
           break;
         }
+        case "segment": {
+          const n = graph.shapeMap[draggingInfo.segmentId];
+          if (!n) { return; }
+          if (!isGraphSegment(n)) { return; }
+          if (!isFullyFree(n)) { return; }
+          const xTo = rx / scale;
+          const yTo = ry / scale;
+          const rs = getPositionForBond(n.starting, graph);
+          const re = getPositionForBond(n.ending, graph);
+          const dx = xTo - rs.x;
+          const dy = yTo - rs.y;
+          updateSegment(n.id, {
+            starting: { x: rs.x + dx, y: rs.y + dy },
+            ending: { x: re.x + dx, y: re.y + dy },
+          });
+          break;
+        }
         case "reshaper": {
           const n = graph.shapeMap[draggingInfo.nodeId];
           if (!n) { return; }
@@ -293,12 +310,8 @@ export const GraphView = () => {
     };
     const handleMouseUp = () => {
       switch (draggingInfo.target) {
-        case "node": {
-          setDraggingInfo({
-            target: null,
-          });
-          break;
-        }
+        case "node":
+        case "segment":
         case "reshaper": {
           setDraggingInfo({
             target: null,
@@ -394,15 +407,33 @@ export const GraphView = () => {
             }}
 
             mouseDown={(e, draggableMatter) => {
-              if (draggingInfo.target === "node") { return; }
-              if (draggableMatter.target !== "node") { return; }
-              const node = graph.shapeMap[draggableMatter.nodeId];
-              if (!isGraphNode(node)) { return; }
-              setDraggingInfo({
-                ...draggableMatter,
-                origin: { x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale, },
-                size: node.size,
-              });
+              console.log(draggableMatter);
+              switch (draggableMatter.target) {
+                case "node": {
+                  if (draggingInfo.target === "node") { return; }
+                  const node = graph.shapeMap[draggableMatter.nodeId];
+                  if (!isGraphNode(node)) { return; }
+                  setDraggingInfo({
+                    ...draggableMatter,
+                    origin: { x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale, },
+                    size: node.size,
+                  });
+                  break;
+                }
+                case "segment": {
+                  if (draggingInfo.target === "segment") { return; }
+                  const segment = graph.shapeMap[draggableMatter.segmentId];
+                  console.log(segment);
+                  if (!isGraphSegment(segment)) { return; }
+                  if (!isFullyFree(segment)) { return; }
+                  const s = getPositionForBond(segment.starting, graph);
+                  setDraggingInfo({
+                    ...draggableMatter,
+                    origin: { x: e.clientX - s.x * scale, y: e.clientY - s.y * scale, },
+                  });
+                  break;
+                }
+              }
             }}
           />
         </g>
@@ -477,7 +508,7 @@ export const GraphView = () => {
             } else if (isGraphSegment(node)) {
               switch (draggableMatter.resizerType) {
                 case "Start": {
-                  const r = positionForBond(node.starting, graph);
+                  const r = getPositionForBond(node.starting, graph);
                   setDraggingInfo({
                     ...draggableMatter,
                     origin: { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, },
@@ -485,7 +516,7 @@ export const GraphView = () => {
                   break;
                 }
                 case "End": {
-                  const r = positionForBond(node.ending, graph);
+                  const r = getPositionForBond(node.ending, graph);
                   setDraggingInfo({
                     ...draggableMatter,
                     origin: { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, },

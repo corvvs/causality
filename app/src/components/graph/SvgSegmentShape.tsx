@@ -1,22 +1,13 @@
 import { affineApply } from "../../libs/affine";
-import { getNodeCenter } from "../../libs/shape";
+import { getPositionForBond, isFullyBonded, isFullyFree } from "../../libs/segment";
 import { vectorMid } from "../../libs/vector";
 import { useDisplay } from "../../stores/display";
-import { CausalGraph, GraphSegment, isBondedToShape, isGraphNode, SegmentBond, Vector } from "../../types";
+import { CausalGraph, GraphSegment, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
 import { Reshaper } from "../../views/GraphView/types";
 import { ReshaperCorner } from "./Reshaper";
 import { CommonProps } from "./types";
 
-export function positionForBond(bond: SegmentBond, graph: CausalGraph): Vector {
-  if (isBondedToShape(bond)) {
-    const shape = graph.shapeMap[bond];
-    if (!isGraphNode(shape)) { throw new Error(`invalid shapeId: ${bond}`); }
-    return getNodeCenter(shape);
-  } else {
-    return bond;
-  }
-}
 
 const Reshapers = (props: DraggableProps & {
   shape: GraphSegment;
@@ -46,8 +37,8 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
     affineFieldToTag,
   } = useDisplay();
 
-  const startCenter = positionForBond(shape.starting, graph);
-  const endCenter = positionForBond(shape.ending, graph);
+  const startCenter = getPositionForBond(shape.starting, graph);
+  const endCenter = getPositionForBond(shape.ending, graph);
   const rStart = affineApply(affineFieldToTag, startCenter);
   const rEnd = affineApply(affineFieldToTag, endCenter);
   return <>
@@ -70,13 +61,15 @@ export const SvgSegmentShape: ComponentWithProps<CommonProps<GraphSegment> & Dra
     graph,
   } = props;
 
-  const startCenter = positionForBond(shape.starting, graph);
-  const endCenter = positionForBond(shape.ending, graph);
+  const startCenter = getPositionForBond(shape.starting, graph);
+  const endCenter = getPositionForBond(shape.ending, graph);
 
   const center = vectorMid(startCenter, endCenter);
   const basePosition = center;
   const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;
 
+  const lineWidth = 1;
+  const margin = lineWidth + 5;
   return <g
     style={{
       transform: baseTranslation,
@@ -87,9 +80,26 @@ export const SvgSegmentShape: ComponentWithProps<CommonProps<GraphSegment> & Dra
       y1={startCenter.y - center.y}
       x2={endCenter.x - center.x}
       y2={endCenter.y - center.y}
+      strokeWidth={lineWidth}
+    />
+    <line
+      className="hit-target"
+      x1={startCenter.x - center.x}
+      y1={startCenter.y - center.y}
+      x2={endCenter.x - center.x}
+      y2={endCenter.y - center.y}
+      strokeWidth={margin}
       onClick={(e) => {
         if (!props.click) { return; }
         props.click(e, shape);
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        console.log("mouseDown");
+        if (!props.mouseDown) { return; }
+        if (!isFullyFree(shape)) { return; }
+        console.log(shape);
+        props.mouseDown(e, { target: "segment", segmentId: shape.id });
         e.stopPropagation();
       }}
     />

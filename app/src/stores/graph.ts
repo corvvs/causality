@@ -57,8 +57,8 @@ function newSegment(index: number, position: Vector): GraphSegment {
     id: index,
     shapeType: "Segment",
     label: "",
-    starting: vectorAdd(position, { x: 100, y: 0 }),
-    ending: vectorAdd(position, { x: -100, y: 0 }),
+    starting: vectorAdd(position, { x: +100, y: -50 }),
+    ending: vectorAdd(position, { x: -100, y: +50 }),
     z: index,
   };
 }

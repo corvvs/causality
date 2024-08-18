@@ -7,9 +7,9 @@ import { CommonProps } from "./types";
 export const SvgNodeRectangleSelectedShape = SvgNodeRectangleLikeSelectedShape;
 
 export const SvgNodeRectangleShape: ComponentWithProps<CommonProps<RectangleNode> & DraggableProps & SelectiveProps> = (props) => {
-  const { shape: node } = props;
+  const { shape } = props;
 
-  const basePosition = node.position;
+  const basePosition = shape.position;
   const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;
   return <g
     style={{
@@ -18,22 +18,22 @@ export const SvgNodeRectangleShape: ComponentWithProps<CommonProps<RectangleNode
   >
     <rect
       x="0" y="0"
-      width={node.size.width}
-      height={node.size.height}
+      width={shape.size.width}
+      height={shape.size.height}
       fill="transparent"
-      strokeWidth={node.shape.line.lineWidth}
+      strokeWidth={shape.shape.line.lineWidth}
       onClick={(e) => {
         if (!props.click) { return; }
-        props.click(e, node);
+        props.click(e, shape);
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
         if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "node", nodeId: node.id });
+        props.mouseDown(e, { target: "node", nodeId: shape.id });
         e.stopPropagation();
       }}
     />
 
-    <SvgNodeInnterText node={node} />
+    <SvgNodeInnterText node={shape} />
   </g>;
 };

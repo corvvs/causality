@@ -14,7 +14,7 @@ export const SelectedLayer = (props: {
   return <g>
     {props.selectedNodes.ids.map((id) => {
       const shape = graph.shapeMap[id];
-      return <SvgNodeSelectedShape key={shape.id} node={shape} {...props} />
+      return <SvgNodeSelectedShape key={shape.id} graph={graph} shape={shape} {...props} />
     })}
   </g>
 };

@@ -34,7 +34,7 @@ type LineShape = {
 };
 
 type NodeShapeType = "Rectangle" | "Circle";
-type ShapeType = NodeShapeType | "Edge";
+type ShapeType = NodeShapeType | "Segment";
 type ShapeId = number;
 
 
@@ -51,6 +51,10 @@ export type GraphNode = GraphShape & {
 
 export function isGraphNode(shape: GraphShape): shape is GraphNode {
   return shape.shapeType === "Rectangle" || shape.shapeType === "Circle";
+}
+
+export function isGraphSegment(shape: GraphShape): shape is GraphSegment {
+  return shape.shapeType === "Segment";
 }
 
 type RectangleLikeShape = {
@@ -74,14 +78,25 @@ export type CircleNode = GraphNode & {
   shape: CircleShape;
 };
 
-export type GraphEdge = GraphShape & {
-  shapeType: "Edge";
-  startNodeId: ShapeId;
-  endNodeId: ShapeId;
+/**
+ * セグメントの端点を表す型
+ * ShapeId であればなんらかのシェイプに接続していることを示す
+ * Vector であれば座標を示す
+ */
+export type SegmentBond = ShapeId | Vector;
+
+export type GraphSegment = GraphShape & {
+  shapeType: "Segment";
+  starting: SegmentBond;
+  ending: SegmentBond;
   z: number;
 };
 
-export type NodeEdgeMap = {
+export function isBondedToShape(bond: SegmentBond): bond is ShapeId {
+  return typeof bond === "number";
+}
+
+export type NodeSegmentMap = {
   [id_pair: string]: ShapeId[];
 };
 
@@ -89,8 +104,8 @@ export type CausalGraph = {
   index: number;
   shapeMap: { [id: ShapeId]: GraphShape };
   orders: ShapeId[];
-  forwardEdgeMap: NodeEdgeMap;
-  backwardEdgeMap: NodeEdgeMap;
+  forwardSegmentMap: NodeSegmentMap;
+  backwardSegmentMap: NodeSegmentMap;
 }
 
 export type CausalDisplay = {

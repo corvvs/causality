@@ -1,92 +1,77 @@
 import { affineApply } from "../../libs/affine";
 import { useDisplay } from "../../stores/display";
-import { RectangleLikeNode } from "../../types";
+import { RectangleLikeNode, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
-import { Resizer } from "../../views/GraphView/types";
+import { Reshaper } from "../../views/GraphView/types";
+import { ReshaperCorner, ReshaperSide } from "./Reshaper";
 
-export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<{ node: RectangleLikeNode } & DraggableProps> = (props) => {
-  const { node } = props;
+
+const Reshapers = (props: DraggableProps & {
+  shape: RectangleLikeNode;
+  rNorthWest: Vector;
+  rSouthEast: Vector;
+}) => {
+  const {
+    rNorthWest, rSouthEast,
+  } = props;
+  const rw = rSouthEast.x - rNorthWest.x;
+  const rh = rSouthEast.y - rNorthWest.y;
+
+  const handleSize = 12;
+
+  const centers1: Reshaper[] = [
+    { type: "N", center: { x: (rNorthWest.x + rSouthEast.x) / 2, y: rNorthWest.y }, size: { width: rw, height: handleSize } },
+    { type: "W", center: { x: rNorthWest.x, y: (rNorthWest.y + rSouthEast.y) / 2 }, size: { width: handleSize, height: rh } },
+    { type: "S", center: { x: (rNorthWest.x + rSouthEast.x) / 2, y: rSouthEast.y }, size: { width: rw, height: handleSize } },
+    { type: "E", center: { x: rSouthEast.x, y: (rNorthWest.y + rSouthEast.y) / 2 }, size: { width: handleSize, height: rh } },
+  ];
+
+  const centers2: Reshaper[] = [
+    { type: "NW", center: rNorthWest, size: { width: handleSize, height: handleSize } },
+    { type: "SW", center: { x: rNorthWest.x, y: rSouthEast.y }, size: { width: handleSize, height: handleSize } },
+    { type: "SE", center: rSouthEast, size: { width: handleSize, height: handleSize } },
+    { type: "NE", center: { x: rSouthEast.x, y: rNorthWest.y }, size: { width: handleSize, height: handleSize } },
+  ];
+
+  return <>
+    {centers1.map((rs) => <ReshaperSide key={rs.type} reshaper={rs} {...props} />)}
+    {centers2.map((rs) => <ReshaperCorner key={rs.type} reshaper={rs} {...props} />)}
+  </>;
+};
+
+// const Linkers = (props: DraggableProps & {
+//   node: RectangleLikeNode;
+//   rNorthWest: Vector;
+//   rSouthEast: Vector;
+// }) => {
+
+// };
+
+export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<{ shape: RectangleLikeNode } & DraggableProps> = (props) => {
+  const { shape } = props;
   const {
     scale,
     affineFieldToTag,
   } = useDisplay();
 
-  const margin = (node.shape.line.lineWidth + 1) * scale / 2;
+  const boxMargin = (shape.shape.line.lineWidth + 1) * scale / 2;
 
-  const x0 = node.position.x;
-  const y0 = node.position.y;
-  const x1 = node.position.x + node.size.width;
-  const y1 = node.position.y + node.size.height;
-  const r0 = affineApply(affineFieldToTag, { x: x0, y: y0 });
-  const r1 = affineApply(affineFieldToTag, { x: x1, y: y1 });
-  const rw = r1.x - r0.x;
-  const rh = r1.y - r0.y;
-
-  const handleSize = 12;
-
-  const centers1: Resizer[] = [
-    { type: "N", center: { x: (r0.x + r1.x) / 2, y: r0.y }, size: { width: rw, height: handleSize } },
-    { type: "W", center: { x: r0.x, y: (r0.y + r1.y) / 2 }, size: { width: handleSize, height: rh } },
-    { type: "S", center: { x: (r0.x + r1.x) / 2, y: r1.y }, size: { width: rw, height: handleSize } },
-    { type: "E", center: { x: r1.x, y: (r0.y + r1.y) / 2 }, size: { width: handleSize, height: rh } },
-  ];
-
-  const centers2: Resizer[] = [
-    { type: "NW", center: r0, size: { width: handleSize, height: handleSize } },
-    { type: "SW", center: { x: r0.x, y: r1.y }, size: { width: handleSize, height: handleSize } },
-    { type: "SE", center: r1, size: { width: handleSize, height: handleSize } },
-    { type: "NE", center: { x: r1.x, y: r0.y }, size: { width: handleSize, height: handleSize } },
-  ];
-
-  const resizerCursor = {
-    NW: "cursor-nw-resize",
-    NE: "cursor-ne-resize",
-    SE: "cursor-se-resize",
-    SW: "cursor-sw-resize",
-    N: "cursor-n-resize",
-    E: "cursor-e-resize",
-    S: "cursor-s-resize",
-    W: "cursor-w-resize",
-  };
+  const x0 = shape.position.x;
+  const y0 = shape.position.y;
+  const x1 = shape.position.x + shape.size.width;
+  const y1 = shape.position.y + shape.size.height;
+  const rNorthWest = affineApply(affineFieldToTag, { x: x0, y: y0 });
+  const rSouthEast = affineApply(affineFieldToTag, { x: x1, y: y1 });
 
   return <>
     <rect
       className="node-selection-box pointer-events-none"
-      x={r0.x - margin} y={r0.y - margin}
-      width={r1.x - r0.x + margin * 2}
-      height={r1.y - r0.y + margin * 2}
+      x={rNorthWest.x - boxMargin} y={rNorthWest.y - boxMargin}
+      width={rSouthEast.x - rNorthWest.x + boxMargin * 2}
+      height={rSouthEast.y - rNorthWest.y + boxMargin * 2}
       fill="transparent"
       strokeWidth={1.5}
     />
-
-    {centers1.map((rs) => <rect
-      key={rs.type}
-      className={`resizer-edge ${resizerCursor[rs.type]} stroke-transparent fill-transparent`}
-      x={rs.center.x - rs.size.width / 2} y={rs.center.y - rs.size.height / 2}
-      width={rs.size.width} height={rs.size.height}
-      onMouseDown={(e) => {
-        if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "nodeResizer", nodeId: node.id, resizerType: rs.type });
-        e.stopPropagation();
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    />)}
-
-    {centers2.map((rs) => <rect
-      key={rs.type}
-      className={`resizer-corner ${resizerCursor[rs.type]} stroke-1 hover:fill-blue-400`}
-      x={rs.center.x - rs.size.width / 2} y={rs.center.y - rs.size.height / 2}
-      width={rs.size.width} height={rs.size.height}
-      onMouseDown={(e) => {
-        if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "nodeResizer", nodeId: node.id, resizerType: rs.type });
-        e.stopPropagation();
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    />)}
+    <Reshapers {...props} rNorthWest={rNorthWest} rSouthEast={rSouthEast} />
   </>;
 };

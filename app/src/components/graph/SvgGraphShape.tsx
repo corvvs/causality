@@ -1,8 +1,8 @@
-import { CircleNode, GraphEdge, GraphShape, RectangleNode } from "../../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphShape, RectangleNode } from "../../types";
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
-import { SvgEdgeShape } from "./SvgEdgeShape";
 import { SvgNodeCircleSelectedShape, SvgNodeCircleShape } from "./SvgNodeCircleShape";
 import { SvgNodeRectangleSelectedShape, SvgNodeRectangleShape } from "./SvgNodeRectangleShape";
+import { SvgSegmentSelectedShape, SvgSegmentShape } from "./SvgSegmentShape";
 import { CommonProps } from "./types";
 
 export const SvgGraphShape: ComponentWithProps<CommonProps<GraphShape> & DraggableProps & SelectiveProps> = (props) => {
@@ -11,20 +11,20 @@ export const SvgGraphShape: ComponentWithProps<CommonProps<GraphShape> & Draggab
       return <SvgNodeRectangleShape {...props} shape={props.shape as RectangleNode} />;
     case "Circle":
       return <SvgNodeCircleShape {...props} shape={props.shape as CircleNode} />;
-    case "Edge":
-      return <SvgEdgeShape {...props} shape={props.shape as GraphEdge} />;
+    case "Segment":
+      return <SvgSegmentShape {...props} shape={props.shape as GraphSegment} />;
     default:
       return null;
   }
 };
 
-export const SvgNodeSelectedShape: ComponentWithProps<{ node: GraphShape } & DraggableProps> = (props) => {
-  switch (props.node.shapeType) {
+export const SvgNodeSelectedShape: ComponentWithProps<{ shape: GraphShape; graph: CausalGraph } & DraggableProps> = (props) => {
+  switch (props.shape.shapeType) {
     case "Rectangle":
-      return <SvgNodeRectangleSelectedShape {...props} node={props.node as RectangleNode} />;
+      return <SvgNodeRectangleSelectedShape {...props} shape={props.shape as RectangleNode} />;
     case "Circle":
-      return <SvgNodeCircleSelectedShape {...props} node={props.node as CircleNode} />;
+      return <SvgNodeCircleSelectedShape {...props} shape={props.shape as CircleNode} />;
     default:
-      return null;
+      return <SvgSegmentSelectedShape {...props} shape={props.shape as GraphSegment} />;
   }
 }

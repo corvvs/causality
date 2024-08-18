@@ -13,6 +13,7 @@ import { useDisplay } from "../../stores/display"
 import { affineApply } from "../../libs/affine"
 import { useGraph } from "../../stores/graph"
 import { GoArrowUpRight } from "react-icons/go"
+import { PiLineSegment } from "react-icons/pi"
 
 const getIconTypeForColorTheme = (colorTheme: ColorTheme) => {
   switch (colorTheme) {
@@ -25,113 +26,151 @@ const getIconTypeForColorTheme = (colorTheme: ColorTheme) => {
   }
 };
 
-export const BasicPalette: ComponentWithProps<{
+const ShapesSubPalette: ComponentWithProps<{
   getCenter: () => Vector;
 }> = (props) => {
-
-  const {
-    appColorTheme,
-  } = useColorTheme();
-
   const {
     affineTagToField,
   } = useDisplay();
 
   const {
-    graph,
     addRectNode,
     addCircleNode,
-    linkUpNodes,
+    addSegment,
   } = useGraph();
 
+  return <Popover className="relative">
+    <PopoverButton as="div">
+      <Button className="basic-palette-button p-1">
+        <InlineIcon i={<TbSquares className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="right" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      <MultipleButtons
+        items={[
+          {
+            key: "Rectangle",
+            content: <div
+              className="h-[1.5rem]"
+            >
+              <InlineIcon i={<TbSquare />} />
+            </div>
+          },
+          {
+            key: "Circle",
+            content: <div
+              className="h-[1.5rem]"
+            >
+              <InlineIcon i={<TbCircle />} />
+            </div>
+          },
+          {
+            key: "Segment",
+            content: <div
+              className="h-[1.5rem]"
+            >
+              <InlineIcon i={<PiLineSegment />} />
+            </div>
+          },
+        ]}
+        onClick={(item) => {
+          const center = props.getCenter();
+          const tCenter = affineApply(affineTagToField, center);
+          switch (item.key) {
+            case "Rectangle":
+              addRectNode(tCenter);
+              break;
+            case "Circle":
+              addCircleNode(tCenter);
+              break;
+            case "Segment":
+              addSegment(tCenter);
+              break;
+          }
+        }}
+      />
+    </PopoverPanel>
+  </Popover>
+};
+
+
+const LinkerSubPalette: ComponentWithProps<{
+  getCenter: () => Vector;
+}> = () => {
+  const {
+    graph,
+    linkUpNodes,
+  } = useGraph();
+  return <Button
+    className="basic-palette-button p-1"
+    onClick={() => {
+      const nodeOrders = graph.orders.filter(id => graph.shapeMap[id].shapeType !== "Segment");
+      if (nodeOrders.length < 2) { return; }
+      const a = graph.shapeMap[nodeOrders[0]];
+      const b = graph.shapeMap[nodeOrders[1]];
+      console.log(a, b);
+      linkUpNodes(a.id, b.id);
+    }}
+  >
+    <InlineIcon i={<GoArrowUpRight className="w-6 h-6" />} />
+  </Button>
+}
+
+const ScaleSubPalette: ComponentWithProps<{
+  getCenter: () => Vector;
+}> = (props) => {
+  return <Popover className="relative">
+    <PopoverButton as="div">
+      <Button className="basic-palette-button p-1">
+        <InlineIcon i={<SlMagnifier className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="right" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      <ScaleView getCenter={props.getCenter} />
+    </PopoverPanel>
+  </Popover>
+}
+
+const ThemeSubPalette: ComponentWithProps<{
+  getCenter: () => Vector;
+}> = () => {
+  const {
+    appColorTheme,
+  } = useColorTheme();
   const IconTypeForColorTheme = getIconTypeForColorTheme(appColorTheme);
+  return <Popover className="relative">
+    <PopoverButton as="div">
+      <Button className="basic-palette-button p-1">
+        <InlineIcon i={<IconTypeForColorTheme className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="right" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      <ThemeSelector />
+    </PopoverPanel>
+  </Popover>
+
+}
+
+export const BasicPalette: ComponentWithProps<{
+  getCenter: () => Vector;
+}> = (props) => {
 
   return <div className="basic-palette">
     <div className="grid grid-cols-1 grid-flow-row gap-2 p-1 pb-4">
       <div>
-        <Popover className="relative">
-          <PopoverButton as="div">
-            <Button className="basic-palette-button p-1">
-              <InlineIcon i={<TbSquares className="w-6 h-6" />} />
-            </Button>
-          </PopoverButton>
-          <PopoverPanel anchor="right" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
-            <MultipleButtons
-              items={[
-                {
-                  key: "Rectangle",
-                  content: <div
-                    className="h-[1.5rem]"
-                  >
-                    <InlineIcon i={<TbSquare />} />
-                  </div>
-                },
-                {
-                  key: "Circle",
-                  content: <div
-                    className="h-[1.5rem]"
-                  >
-                    <InlineIcon i={<TbCircle />} />
-                  </div>
-                },
-              ]}
-              onClick={(item) => {
-                const center = props.getCenter();
-                const tCenter = affineApply(affineTagToField, center);
-                switch (item.key) {
-                  case "Rectangle":
-                    addRectNode(tCenter);
-                    break;
-                  case "Circle":
-                    addCircleNode(tCenter);
-                    break;
-                }
-              }}
-            />
-          </PopoverPanel>
-        </Popover>
+        <ShapesSubPalette getCenter={props.getCenter} />
       </div>
 
       <div>
-        <Button
-          className="basic-palette-button p-1"
-          onClick={() => {
-            const nodeOrders = graph.orders.filter(id => graph.shapeMap[id].shapeType !== "Edge");
-            if (nodeOrders.length < 2) { return; }
-            const a = graph.shapeMap[nodeOrders[0]];
-            const b = graph.shapeMap[nodeOrders[1]];
-            console.log(a, b);
-            linkUpNodes(a.id, b.id);
-          }}
-        >
-          <InlineIcon i={<GoArrowUpRight className="w-6 h-6" />} />
-        </Button>
+        <LinkerSubPalette getCenter={props.getCenter} />
       </div>
 
       <div>
-        <Popover className="relative">
-          <PopoverButton as="div">
-            <Button className="basic-palette-button p-1">
-              <InlineIcon i={<SlMagnifier className="w-6 h-6" />} />
-            </Button>
-          </PopoverButton>
-          <PopoverPanel anchor="right" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
-            <ScaleView getCenter={props.getCenter} />
-          </PopoverPanel>
-        </Popover>
+        <ScaleSubPalette getCenter={props.getCenter} />
       </div>
 
       <div>
-        <Popover className="relative">
-          <PopoverButton as="div">
-            <Button className="basic-palette-button p-1">
-              <InlineIcon i={<IconTypeForColorTheme className="w-6 h-6" />} />
-            </Button>
-          </PopoverButton>
-          <PopoverPanel anchor="right" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
-            <ThemeSelector />
-          </PopoverPanel>
-        </Popover>
+        <ThemeSubPalette getCenter={props.getCenter} />
       </div>
     </div>
   </div>

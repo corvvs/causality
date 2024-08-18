@@ -1,6 +1,7 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphEdge, GraphNode, NodeEdgeMap, RectangleNode, Vector } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphNode, NodeSegmentMap, RectangleNode, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
+import { vectorAdd } from "../libs/vector";
 
 const graphKey = "GRAPH";
 const graphProvider = localStorageProvider<CausalGraph>();
@@ -9,11 +10,11 @@ const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
   index: 0,
   shapeMap: {},
   orders: [],
-  forwardEdgeMap: {},
-  backwardEdgeMap: {},
+  forwardSegmentMap: {},
+  backwardSegmentMap: {},
 });
 
-const newRectNode = (index: number, position: Vector): RectangleNode => {
+function newRectNode(index: number, position: Vector): RectangleNode {
   return {
     id: index,
     position,
@@ -30,9 +31,9 @@ const newRectNode = (index: number, position: Vector): RectangleNode => {
       },
     },
   }
-};
+}
 
-const newCircleNode = (index: number, position: Vector): CircleNode => {
+function newCircleNode(index: number, position: Vector): CircleNode {
   return {
     id: index,
     position,
@@ -49,7 +50,18 @@ const newCircleNode = (index: number, position: Vector): CircleNode => {
       },
     },
   }
-};
+}
+
+function newSegment(index: number, position: Vector): GraphSegment {
+  return {
+    id: index,
+    shapeType: "Segment",
+    label: "",
+    starting: vectorAdd(position, { x: 100, y: 0 }),
+    ending: vectorAdd(position, { x: -100, y: 0 }),
+    z: index,
+  };
+}
 
 export const useGraph = () => {
   const [graph, setGraph] = useAtom(graphAtom);
@@ -70,8 +82,8 @@ export const useGraph = () => {
           [nn.id]: nn,
         },
         orders: [...prev.orders, nn.id],
-        forwardEdgeMap: prev.forwardEdgeMap,
-        backwardEdgeMap: prev.backwardEdgeMap,
+        forwardSegmentMap: prev.forwardSegmentMap,
+        backwardSegmentMap: prev.backwardSegmentMap,
       };
     });
     return nn;
@@ -88,46 +100,63 @@ export const useGraph = () => {
           [nn.id]: nn,
         },
         orders: [...prev.orders, nn.id],
-        forwardEdgeMap: prev.forwardEdgeMap,
-        backwardEdgeMap: prev.backwardEdgeMap,
+        forwardSegmentMap: prev.forwardSegmentMap,
+        backwardSegmentMap: prev.backwardSegmentMap,
       };
     });
     return nn;
   };
 
+  const addSegment = (position: Vector) => {
+    const newIndex = graph.index + 1;
+    const nn = newSegment(newIndex, position);
+    setGraph((prev) => {
+      return {
+        index: newIndex,
+        shapeMap: {
+          ...prev.shapeMap,
+          [nn.id]: nn,
+        },
+        orders: [...prev.orders, nn.id],
+        forwardSegmentMap: prev.forwardSegmentMap,
+        backwardSegmentMap: prev.backwardSegmentMap,
+      };
+    });
+  }
+
   /**
    * 2つのノードを結ぶエッジを作成する
-   * @param startNodeId 
-   * @param endNodeId 
+   * @param starting 
+   * @param ending 
    */
-  const linkUpNodes = (startNodeId: number, endNodeId: number) => {
-    if (startNodeId === endNodeId) {
+  const linkUpNodes = (starting: number, ending: number) => {
+    if (starting === ending) {
       console.warn("Cannot link a node to itself");
       return;
     }
     const newIndex = graph.index + 1;
-    const edge: GraphEdge = {
+    const edge: GraphSegment = {
       id: newIndex,
-      shapeType: "Edge",
+      shapeType: "Segment",
       label: "",
-      startNodeId,
-      endNodeId,
+      starting,
+      ending,
       z: newIndex,
     };
     setGraph((prev) => {
-      const idPairFT = `${edge.startNodeId}-${edge.endNodeId}`;
-      const idPairTF = `${edge.endNodeId}-${edge.startNodeId}`;
-      const forwardEdgeMap: NodeEdgeMap = { ...prev.forwardEdgeMap, [idPairFT]: prev.forwardEdgeMap[idPairFT] || [] };
-      const backwardEdgeMap: NodeEdgeMap = { ...prev.backwardEdgeMap, [idPairTF]: prev.backwardEdgeMap[idPairTF] || [] };
-      forwardEdgeMap[idPairFT].push(edge.id);
-      backwardEdgeMap[idPairTF].push(edge.id);
+      const idPairFT = `${edge.starting}-${edge.ending}`;
+      const idPairTF = `${edge.ending}-${edge.starting}`;
+      const forwardSegmentMap: NodeSegmentMap = { ...prev.forwardSegmentMap, [idPairFT]: prev.forwardSegmentMap[idPairFT] || [] };
+      const backwardSegmentMap: NodeSegmentMap = { ...prev.backwardSegmentMap, [idPairTF]: prev.backwardSegmentMap[idPairTF] || [] };
+      forwardSegmentMap[idPairFT].push(edge.id);
+      backwardSegmentMap[idPairTF].push(edge.id);
 
       return {
         index: newIndex,
         shapeMap: { ...prev.shapeMap, [edge.id]: edge },
         orders: [...prev.orders, edge.id],
-        forwardEdgeMap,
-        backwardEdgeMap,
+        forwardSegmentMap,
+        backwardSegmentMap,
       };
     });
   };
@@ -148,11 +177,29 @@ export const useGraph = () => {
     });
   };
 
+  const updateSegment = (id: number, shape: Partial<GraphSegment>) => {
+    const n = graph.shapeMap[id];
+    if (!n) { return; }
+    const newShape = { ...n, ...shape };
+    setGraph((prev) => {
+      return {
+        ...prev,
+        shapeMap: {
+          ...prev.shapeMap,
+          [id]: newShape,
+        },
+      };
+    });
+  };
+
+
   return {
     graph,
     addRectNode,
     addCircleNode,
+    addSegment,
     updateNode,
+    updateSegment,
     linkUpNodes,
   };
 };

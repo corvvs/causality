@@ -1,5 +1,5 @@
 import { affineApply } from "../../libs/affine";
-import { getPositionForBond, isFullyBonded, isFullyFree } from "../../libs/segment";
+import { getPositionForBond, isFullyFree } from "../../libs/segment";
 import { vectorMid } from "../../libs/vector";
 import { useDisplay } from "../../stores/display";
 import { CausalGraph, GraphSegment, Vector } from "../../types";

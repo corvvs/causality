@@ -11,7 +11,7 @@ import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
 import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
-import { getPositionForBond, isFullyBonded, isFullyFree } from "../libs/segment";
+import { getPositionForBond, isFullyFree } from "../libs/segment";
 
 function reshapeRectangleLikeNode(props: {
   shape: GraphNode;

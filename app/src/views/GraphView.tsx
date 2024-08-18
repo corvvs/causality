@@ -382,7 +382,7 @@ export const GraphView = () => {
           <NodeGroup
             selectedNodes={selectedNodes}
             graph={graph}
-            click={(e, node) => {
+            click={(_, node) => {
               if (!selectedNodes.set[node.id]) {
                 setSelectedNodes(() => {
                   return {

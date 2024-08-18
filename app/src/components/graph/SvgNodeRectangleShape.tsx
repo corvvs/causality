@@ -1,12 +1,12 @@
 import { RectangleNode } from "../../types";
-import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
+import { ComponentWithProps } from "../../types/components";
 import { SvgNodeInnterText } from "./SvgNodeInnterText";
 import { SvgNodeRectangleLikeSelectedShape } from "./SvgNodeRectangleLikeSelectedShape";
-import { CommonProps } from "./types";
+import { ShapeProps } from "./types";
 
 export const SvgNodeRectangleSelectedShape = SvgNodeRectangleLikeSelectedShape;
 
-export const SvgNodeRectangleShape: ComponentWithProps<CommonProps<RectangleNode> & DraggableProps & SelectiveProps> = (props) => {
+export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>> = (props) => {
   const { shape } = props;
 
   const basePosition = shape.position;
@@ -29,7 +29,7 @@ export const SvgNodeRectangleShape: ComponentWithProps<CommonProps<RectangleNode
       }}
       onMouseDown={(e) => {
         if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "node", nodeId: shape.id });
+        props.mouseDown(e, { target: "segment", segmentId: shape.id });
         e.stopPropagation();
       }}
     />

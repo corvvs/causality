@@ -3,10 +3,10 @@ import { getPositionForBond, isFullyFree } from "../../libs/segment";
 import { vectorMid } from "../../libs/vector";
 import { useDisplay } from "../../stores/display";
 import { CausalGraph, GraphSegment, Vector } from "../../types";
-import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
+import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { Reshaper } from "../../views/GraphView/types";
 import { ReshaperCorner } from "./Reshaper";
-import { CommonProps } from "./types";
+import { ShapeProps } from "./types";
 
 
 const Reshapers = (props: DraggableProps & {
@@ -55,7 +55,7 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
   </>;
 };
 
-export const SvgSegmentShape: ComponentWithProps<CommonProps<GraphSegment> & DraggableProps & SelectiveProps> = (props) => {
+export const SvgSegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props) => {
   const {
     shape,
     graph,

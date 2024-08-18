@@ -1,12 +1,12 @@
 import { CircleNode } from "../../types";
-import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
+import { ComponentWithProps } from "../../types/components";
 import { SvgNodeInnterText } from "./SvgNodeInnterText";
 import { SvgNodeRectangleLikeSelectedShape } from "./SvgNodeRectangleLikeSelectedShape";
-import { CommonProps } from "./types";
+import { ShapeProps } from "./types";
 
 export const SvgNodeCircleSelectedShape = SvgNodeRectangleLikeSelectedShape;
 
-export const SvgNodeCircleShape: ComponentWithProps<CommonProps<CircleNode> & DraggableProps & SelectiveProps> = (props) => {
+export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (props) => {
   const { shape: node } = props;
 
   const basePosition = node.position;

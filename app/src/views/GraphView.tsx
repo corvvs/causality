@@ -41,7 +41,6 @@ export const GraphView = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   useRerenderOnResize(svgRef);
 
-
   const [selectedNodes, setSelectedNodes] = useState<NodeSelection>({
     ids: [],
     set: {},
@@ -116,10 +115,17 @@ export const GraphView = () => {
       }
     };
 
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [draggingInfo, scale, updateNode, updateSegment, getShape, graph, moveOrigin, modifierKey]);
+
+  useEffect(() => {
     const handleMouseUp = () => {
       switch (draggingInfo.target) {
         case "node": {
-          console.log("** COMMIT NODE **", getShape(draggingInfo.shapeId), "=>", getActualShape(draggingInfo.shapeId));
           commitEdit(draggingInfo.shapeId);
           setDraggingInfo({
             target: null,
@@ -127,7 +133,6 @@ export const GraphView = () => {
           break;
         }
         case "segment": {
-          console.log("** COMMIT SEGMENT **", getShape(draggingInfo.shapeId), "=>", getActualShape(draggingInfo.shapeId));
           commitEdit(draggingInfo.shapeId);
           setDraggingInfo({
             target: null,
@@ -135,7 +140,6 @@ export const GraphView = () => {
           break;
         }
         case "reshaper": {
-          console.log("** COMMIT RESHAPE **", getShape(draggingInfo.shapeId), "=>", getActualShape(draggingInfo.shapeId));
           commitEdit(draggingInfo.shapeId);
           setDraggingInfo({
             target: null,
@@ -144,7 +148,13 @@ export const GraphView = () => {
         }
       }
     };
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [draggingInfo, commitEdit, getShape, getActualShape]);
 
+  useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
       if (draggingInfo.target !== "field") { return; }
       // フィールド自体のドラッグを行う
@@ -157,17 +167,11 @@ export const GraphView = () => {
         origin: { x, y },
       });
     };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousedown', handleMouseDown);
-
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, [draggingInfo, scale, display, updateNode, updateSegment, getShape, moveOrigin, getActualShape, commitEdit, modifierKey, graph]);
+    }
+  }, [display.origin, draggingInfo.target]);
 
   useOnPinch({
     onPinchZoom: (e) => {

@@ -5,6 +5,7 @@ export const useOnPinch = (props: {
   onPinchScroll?: (e: WheelEvent) => void,
 }) => {
   const { onPinchZoom, onPinchScroll } = props;
+
   useEffect(() => {
     const preventDefault = (e: Event) => {
       e.preventDefault();
@@ -14,6 +15,17 @@ export const useOnPinch = (props: {
         e.preventDefault();
       }
     };
+    document.addEventListener('touchstart', preventTouchDefault, { passive: false });
+    document.addEventListener('touchmove', preventTouchDefault, { passive: false });
+    document.addEventListener('gesturestart', preventDefault);
+    return () => {
+      document.removeEventListener('touchstart', preventTouchDefault);
+      document.removeEventListener('touchmove', preventTouchDefault);
+      document.removeEventListener('gesturestart', preventDefault);
+    };
+  }, []);
+
+  useEffect(() => {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (e.ctrlKey) {
@@ -26,16 +38,8 @@ export const useOnPinch = (props: {
         }
       }
     };
-
-    document.addEventListener('touchstart', preventTouchDefault, { passive: false });
-    document.addEventListener('touchmove', preventTouchDefault, { passive: false });
-    document.addEventListener('gesturestart', preventDefault);
     document.addEventListener('wheel', onWheel, { passive: false });
-
     return () => {
-      document.removeEventListener('touchstart', preventTouchDefault);
-      document.removeEventListener('touchmove', preventTouchDefault);
-      document.removeEventListener('gesturestart', preventDefault);
       document.removeEventListener('wheel', onWheel);
     };
   }, [onPinchScroll, onPinchZoom]);
@@ -55,5 +59,5 @@ export const useRerenderOnResize = (ref: React.MutableRefObject<Element | null>)
     return () => {
       resizeObserver.disconnect();
     };
-  });
+  }, [ref, setSize]);
 };

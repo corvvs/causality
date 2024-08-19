@@ -29,7 +29,7 @@ export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>
       }}
       onMouseDown={(e) => {
         if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "segment", segmentId: shape.id });
+        props.mouseDown(e, { target: "node", shapeId: shape.id, shape });
         e.stopPropagation();
       }}
     />

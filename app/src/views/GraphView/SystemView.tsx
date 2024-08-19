@@ -32,7 +32,7 @@ export const SystemView = (props: {
       selectedNodes: {props.selectedNodes.ids.length}
     </p>
     <p>
-      draggingNode: {props.draggingInfo.target === "node" ? props.draggingInfo.nodeId : "none"}
+      draggingNode: {props.draggingInfo.target === "node" ? props.draggingInfo.shapeId : "none"}
     </p>
     <p>
       draggingTarget: {JSON.stringify(props.draggingInfo)}

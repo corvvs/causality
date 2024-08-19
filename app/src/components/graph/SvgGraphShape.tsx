@@ -2,7 +2,7 @@ import { CausalGraph, CircleNode, GraphSegment, GraphShape, RectangleNode } from
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
 import { SvgNodeCircleSelectedShape, SvgNodeCircleShape } from "./SvgNodeCircleShape";
 import { SvgNodeRectangleSelectedShape, SvgNodeRectangleShape } from "./SvgNodeRectangleShape";
-import { SvgSegmentSelectedShape, SvgSegmentShape } from "./SvgSegmentShape";
+import { SvgSegmentSelectedShape, SegmentShape } from "./SegmentShape";
 import { CommonProps } from "./types";
 
 export const SvgGraphShape: ComponentWithProps<CommonProps<GraphShape> & DraggableProps & SelectiveProps> = (props) => {
@@ -12,7 +12,7 @@ export const SvgGraphShape: ComponentWithProps<CommonProps<GraphShape> & Draggab
     case "Circle":
       return <SvgNodeCircleShape {...props} shape={props.shape as CircleNode} />;
     case "Segment":
-      return <SvgSegmentShape {...props} shape={props.shape as GraphSegment} />;
+      return <SegmentShape {...props} shape={props.shape as GraphSegment} />;
     default:
       return null;
   }

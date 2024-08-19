@@ -100,14 +100,15 @@ const LinkerSubPalette: ComponentWithProps<{
   const {
     graph,
     linkUpNodes,
+    getActualShape,
   } = useGraph();
   return <Button
     className="basic-palette-button p-1"
     onClick={() => {
       const nodeOrders = graph.orders.filter(id => graph.shapeMap[id].shapeType !== "Segment");
       if (nodeOrders.length < 2) { return; }
-      const a = graph.shapeMap[nodeOrders[0]];
-      const b = graph.shapeMap[nodeOrders[1]];
+      const a = getActualShape(nodeOrders[0]);
+      const b = getActualShape(nodeOrders[1]);
       console.log(a, b);
       linkUpNodes(a.id, b.id);
     }}
@@ -157,19 +158,19 @@ export const BasicPalette: ComponentWithProps<{
 
   return <div className="basic-palette">
     <div className="grid grid-cols-1 grid-flow-row gap-2 p-1 pb-4">
-      <div>
+      <div title="Add a Shape">
         <ShapesSubPalette getCenter={props.getCenter} />
       </div>
 
-      <div>
+      <div title="Link some shapes">
         <LinkerSubPalette getCenter={props.getCenter} />
       </div>
 
-      <div>
+      <div title="Zooming">
         <ScaleSubPalette getCenter={props.getCenter} />
       </div>
 
-      <div>
+      <div title="Color Theme">
         <ThemeSubPalette getCenter={props.getCenter} />
       </div>
     </div>

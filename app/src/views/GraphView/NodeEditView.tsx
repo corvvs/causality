@@ -1,5 +1,5 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { useGraph } from "../../stores/graph";
+import { getShapeForGraph, useGraph } from "../../stores/graph";
 import { NodeSelection } from "./types";
 import { ColorValue } from "../../types";
 import { ColorPicker } from "../../components/ColorPicker";
@@ -13,7 +13,7 @@ export const NodeEditView = (props: {
     graph,
     updateNode,
   } = useGraph();
-  const node = graph.shapeMap[firstId];
+  const node = getShapeForGraph(firstId, graph);
 
   const color = node.labelColor || null;
   const setColor = (v: ColorValue | null) => {

@@ -1,4 +1,4 @@
-import { Size, Vector } from "../../types";
+import { GraphNode, GraphSegment, GraphShape, Size, Vector } from "../../types";
 
 export type ReshaperType = "NW" | "NE" | "SE" | "SW" | "N" | "E" | "S" | "W" | "Start" | "End";
 
@@ -34,19 +34,22 @@ export type DraggingTarget = "node" | "field" | null;
 
 export type NodeSelection = {
   ids: number[];
-  set: { [nodeId: number]: boolean; }
+  set: { [shapeId: number]: boolean; }
 };
 
 export type DraggableMatter = {
   target: "node";
-  nodeId: number;
+  shapeId: number;
+  shape: GraphNode;
 } | {
   target: "segment";
-  segmentId: number;
+  shapeId: number;
+  shape: GraphSegment;
 } | {
   target: "reshaper";
-  nodeId: number;
+  shapeId: number;
   resizerType: ReshaperType;
+  shape: GraphShape;
 } | {
   target: "field";
 };

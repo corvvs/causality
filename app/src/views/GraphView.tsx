@@ -20,7 +20,7 @@ function reshapeRectangleLikeNode(props: {
   scale: number;
   draggingInfo: DraggingInfo;
   modifierKey: MyModifierKey
-  updateNode: (nodeId: number, node: Partial<GraphNode>) => void;
+  updateNode: (shapeId: number, node: Partial<GraphNode>) => void;
 }) {
   const {
     shape: n,
@@ -215,6 +215,10 @@ export const GraphView = () => {
   const {
     updateNode,
     updateSegment,
+    getShape,
+    getActualShape,
+    startEdit,
+    commitEdit,
     graph,
   } = useGraph();
   const {
@@ -248,7 +252,6 @@ export const GraphView = () => {
 
 
   useEffect(() => {
-    window.requestAnimationFrame
     const handleMouseMove = (event: MouseEvent) => {
       if (!draggingInfo.target) { return; }
       if (!draggingInfo.origin) { return; }
@@ -260,7 +263,7 @@ export const GraphView = () => {
 
       switch (draggingInfo.target) {
         case "node": {
-          const n = graph.shapeMap[draggingInfo.nodeId];
+          const n = getShape(draggingInfo.shapeId);
           if (!n) { return; }
           if (!isGraphNode(n)) { return; }
           const xTo = rx / scale;
@@ -270,7 +273,7 @@ export const GraphView = () => {
           break;
         }
         case "segment": {
-          const n = graph.shapeMap[draggingInfo.segmentId];
+          const n = getShape(draggingInfo.shapeId);
           if (!n) { return; }
           if (!isGraphSegment(n)) { return; }
           if (!isFullyFree(n)) { return; }
@@ -287,7 +290,7 @@ export const GraphView = () => {
           break;
         }
         case "reshaper": {
-          const n = graph.shapeMap[draggingInfo.nodeId];
+          const n = getShape(draggingInfo.shapeId);
           if (!n) { return; }
           if (isGraphNode(n)) {
             reshapeRectangleLikeNode({
@@ -310,9 +313,25 @@ export const GraphView = () => {
     };
     const handleMouseUp = () => {
       switch (draggingInfo.target) {
-        case "node":
-        case "segment":
+        case "node": {
+          console.log("** COMMIT NODE **", getShape(draggingInfo.shapeId), "=>", getActualShape(draggingInfo.shapeId));
+          commitEdit(draggingInfo.shapeId);
+          setDraggingInfo({
+            target: null,
+          });
+          break;
+        }
+        case "segment": {
+          console.log("** COMMIT SEGMENT **", getShape(draggingInfo.shapeId), "=>", getActualShape(draggingInfo.shapeId));
+          commitEdit(draggingInfo.shapeId);
+          setDraggingInfo({
+            target: null,
+          });
+          break;
+        }
         case "reshaper": {
+          console.log("** COMMIT RESHAPE **", getShape(draggingInfo.shapeId), "=>", getActualShape(draggingInfo.shapeId));
+          commitEdit(draggingInfo.shapeId);
           setDraggingInfo({
             target: null,
           });
@@ -407,12 +426,12 @@ export const GraphView = () => {
             }}
 
             mouseDown={(e, draggableMatter) => {
-              console.log(draggableMatter);
               switch (draggableMatter.target) {
                 case "node": {
                   if (draggingInfo.target === "node") { return; }
-                  const node = graph.shapeMap[draggableMatter.nodeId];
+                  const node = getActualShape(draggableMatter.shapeId);
                   if (!isGraphNode(node)) { return; }
+                  startEdit(draggableMatter.shapeId);
                   setDraggingInfo({
                     ...draggableMatter,
                     origin: { x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale, },
@@ -422,11 +441,12 @@ export const GraphView = () => {
                 }
                 case "segment": {
                   if (draggingInfo.target === "segment") { return; }
-                  const segment = graph.shapeMap[draggableMatter.segmentId];
+                  const segment = getActualShape(draggableMatter.shapeId);
                   console.log(segment);
                   if (!isGraphSegment(segment)) { return; }
                   if (!isFullyFree(segment)) { return; }
                   const s = getPositionForBond(segment.starting, graph);
+                  startEdit(draggableMatter.shapeId);
                   setDraggingInfo({
                     ...draggableMatter,
                     origin: { x: e.clientX - s.x * scale, y: e.clientY - s.y * scale, },
@@ -441,89 +461,70 @@ export const GraphView = () => {
           selectedNodes={selectedNodes}
           mouseDown={(e, draggableMatter) => {
             if (draggableMatter.target !== "reshaper") { return; }
-            const node = graph.shapeMap[draggableMatter.nodeId];
+            const node = getShape(draggableMatter.shapeId);
             if (isGraphNode(node)) {
               const x = node.position.x;
               const y = node.position.y;
               const w = node.size.width;
               const h = node.size.height;
+              let origin: Vector = { x: 0, y: 0 };
               switch (draggableMatter.resizerType) {
                 case "N": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - (x + w / 2) * scale, y: e.clientY - y * scale, },
-                  });
+                  origin = { x: e.clientX - (x + w / 2) * scale, y: e.clientY - y * scale, };
                   break;
                 }
                 case "E": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - (x + w) * scale, y: e.clientY - (y + h / 2) * scale, },
-                  });
+                  origin = { x: e.clientX - (x + w) * scale, y: e.clientY - (y + h / 2) * scale, };
                   break;
                 }
                 case "S": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - (x + w / 2) * scale, y: e.clientY - (y + h) * scale, },
-                  });
+                  origin = { x: e.clientX - (x + w / 2) * scale, y: e.clientY - (y + h) * scale, };
                   break;
                 }
                 case "W": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - x * scale, y: e.clientY - (y + h / 2) * scale, },
-                  });
+                  origin = { x: e.clientX - x * scale, y: e.clientY - (y + h / 2) * scale, };
                   break;
                 }
                 case "NW": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - x * scale, y: e.clientY - y * scale, },
-                  });
+                  origin = { x: e.clientX - x * scale, y: e.clientY - y * scale, };
                   break;
                 }
                 case "NE": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - (x + w) * scale, y: e.clientY - y * scale, },
-                  });
+                  origin = { x: e.clientX - (x + w) * scale, y: e.clientY - y * scale, };
                   break;
                 }
                 case "SW": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - x * scale, y: e.clientY - (y + h) * scale, },
-                  });
+                  origin = { x: e.clientX - x * scale, y: e.clientY - (y + h) * scale, };
                   break;
                 }
                 case "SE": {
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - (x + w) * scale, y: e.clientY - (y + h) * scale, },
-                  });
+                  origin = { x: e.clientX - (x + w) * scale, y: e.clientY - (y + h) * scale, };
                   break;
                 }
               }
+              startEdit(draggableMatter.shapeId);
+              setDraggingInfo({
+                ...draggableMatter,
+                origin,
+              });
             } else if (isGraphSegment(node)) {
+              let origin: Vector = { x: 0, y: 0 };
               switch (draggableMatter.resizerType) {
                 case "Start": {
                   const r = getPositionForBond(node.starting, graph);
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, },
-                  });
+                  origin = { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, };
                   break;
                 }
                 case "End": {
                   const r = getPositionForBond(node.ending, graph);
-                  setDraggingInfo({
-                    ...draggableMatter,
-                    origin: { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, },
-                  });
+                  origin = { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, };
                   break;
                 }
               }
+              setDraggingInfo({
+                ...draggableMatter,
+                origin,
+              });
             }
           }}
         />

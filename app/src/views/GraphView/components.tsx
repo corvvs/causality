@@ -1,5 +1,5 @@
 import { SvgGraphShape } from "../../components/graph/SvgGraphShape";
-import { useGraph } from "../../stores/graph";
+import { getShapeForGraph, useGraph } from "../../stores/graph";
 import { CausalGraph } from "../../types";
 import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
 import { NodeSelection } from "./types";
@@ -18,7 +18,7 @@ export const NodeGroup: ComponentWithProps<
     return <>
       {
         graph.orders.map(id => {
-          const shape = graph.shapeMap[id];
+          const shape = getShapeForGraph(id, graph);
           return <SvgGraphShape
             key={shape.id}
             shape={shape}

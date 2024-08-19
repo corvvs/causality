@@ -103,9 +103,8 @@ export type NodeSegmentMap = {
 export type CausalGraph = {
   index: number;
   shapeMap: { [id: ShapeId]: GraphShape };
+  temporaryShapeMap: { [id: ShapeId]: GraphShape };
   orders: ShapeId[];
-  forwardSegmentMap: NodeSegmentMap;
-  backwardSegmentMap: NodeSegmentMap;
 }
 
 export type CausalDisplay = {

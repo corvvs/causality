@@ -3,10 +3,12 @@ import { useEffect } from "react";
 
 export type MyModifierKey = {
   shift: boolean;
+  escape: boolean;
 };
 
 const modifierKeyAtom = atom<MyModifierKey>({
   shift: false,
+  escape: false,
 });
 
 /**
@@ -23,7 +25,8 @@ export const useModifierKey = () => {
  * event.key の値に対応する MyModifierKey のフィールド名
  */
 const keyMap: { [key: string]: keyof MyModifierKey } = {
-  "Shift": "shift"
+  "Shift": "shift",
+  "Escape": "escape",
 };
 
 /**

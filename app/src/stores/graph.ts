@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphSegment, GraphNode, NodeSegmentMap, RectangleNode, Vector } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { vectorAdd } from "../libs/vector";
 
@@ -9,9 +9,8 @@ const graphProvider = localStorageProvider<CausalGraph>();
 const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
   index: 0,
   shapeMap: {},
+  temporaryShapeMap: {},
   orders: [],
-  forwardSegmentMap: {},
-  backwardSegmentMap: {},
 });
 
 function newRectNode(index: number, position: Vector): RectangleNode {
@@ -63,8 +62,19 @@ function newSegment(index: number, position: Vector): GraphSegment {
   };
 }
 
+export function getShapeForGraph(id: number, graph: CausalGraph) {
+  return graph.temporaryShapeMap[id] || graph.shapeMap[id];
+}
+
+export function getActualShapeForGraph(id: number, graph: CausalGraph) {
+  return graph.shapeMap[id];
+}
+
 export const useGraph = () => {
   const [graph, setGraph] = useAtom(graphAtom);
+
+  const getShape = (id: number) => getShapeForGraph(id, graph);
+  const getActualShape = (id: number) => getActualShapeForGraph(id, graph);
 
   /**
    * 新しいノードを作成してグラフに追加する.
@@ -81,9 +91,8 @@ export const useGraph = () => {
           ...prev.shapeMap,
           [nn.id]: nn,
         },
+        temporaryShapeMap: { ...prev.temporaryShapeMap },
         orders: [...prev.orders, nn.id],
-        forwardSegmentMap: prev.forwardSegmentMap,
-        backwardSegmentMap: prev.backwardSegmentMap,
       };
     });
     return nn;
@@ -99,9 +108,8 @@ export const useGraph = () => {
           ...prev.shapeMap,
           [nn.id]: nn,
         },
+        temporaryShapeMap: { ...prev.temporaryShapeMap },
         orders: [...prev.orders, nn.id],
-        forwardSegmentMap: prev.forwardSegmentMap,
-        backwardSegmentMap: prev.backwardSegmentMap,
       };
     });
     return nn;
@@ -117,9 +125,8 @@ export const useGraph = () => {
           ...prev.shapeMap,
           [nn.id]: nn,
         },
+        temporaryShapeMap: { ...prev.temporaryShapeMap },
         orders: [...prev.orders, nn.id],
-        forwardSegmentMap: prev.forwardSegmentMap,
-        backwardSegmentMap: prev.backwardSegmentMap,
       };
     });
   }
@@ -144,50 +151,110 @@ export const useGraph = () => {
       z: newIndex,
     };
     setGraph((prev) => {
-      const idPairFT = `${edge.starting}-${edge.ending}`;
-      const idPairTF = `${edge.ending}-${edge.starting}`;
-      const forwardSegmentMap: NodeSegmentMap = { ...prev.forwardSegmentMap, [idPairFT]: prev.forwardSegmentMap[idPairFT] || [] };
-      const backwardSegmentMap: NodeSegmentMap = { ...prev.backwardSegmentMap, [idPairTF]: prev.backwardSegmentMap[idPairTF] || [] };
-      forwardSegmentMap[idPairFT].push(edge.id);
-      backwardSegmentMap[idPairTF].push(edge.id);
-
       return {
         index: newIndex,
         shapeMap: { ...prev.shapeMap, [edge.id]: edge },
+        temporaryShapeMap: { ...prev.temporaryShapeMap },
         orders: [...prev.orders, edge.id],
-        forwardSegmentMap,
-        backwardSegmentMap,
       };
     });
   };
 
 
-  const updateNode = (nodeId: number, node: Partial<GraphNode>) => {
-    const n = graph.shapeMap[nodeId];
-    if (!n) { return; }
-    const newNode = { ...n, ...node };
+  const updateNode = (shapeId: number, shape: Partial<GraphNode>) => {
+    const s = graph.temporaryShapeMap[shapeId];
+    if (!s) {
+      console.warn("no temporary entry found");
+      return;
+    }
+    const newNode = { ...s, ...shape };
     setGraph((prev) => {
       return {
         ...prev,
-        shapeMap: {
-          ...prev.shapeMap,
-          [nodeId]: newNode,
+        temporaryShapeMap: {
+          ...prev.temporaryShapeMap,
+          [shapeId]: newNode,
         },
       };
     });
   };
 
-  const updateSegment = (id: number, shape: Partial<GraphSegment>) => {
-    const n = graph.shapeMap[id];
-    if (!n) { return; }
-    const newShape = { ...n, ...shape };
+  const updateSegment = (shapeId: number, shape: Partial<GraphSegment>) => {
+    const s = graph.temporaryShapeMap[shapeId];
+    if (!s) {
+      console.warn("no temporary entry found");
+      return;
+    }
+    const newShape = { ...s, ...shape };
+    setGraph((prev) => {
+      return {
+        ...prev,
+        temporaryShapeMap: {
+          ...prev.temporaryShapeMap,
+          [shapeId]: newShape,
+        },
+      };
+    });
+  };
+
+  /**
+   * あるシェイプの編集操作を開始すると、そのシェイプ情報がgraph.shapeMapからgraph.temporaryShapeMapにコピーされる。
+   */
+  const startEdit = (id: number) => {
+    if (graph.temporaryShapeMap[id]) {
+      console.warn("detected unexpected temporary entry");
+      return;
+    }
+    const shape = getActualShapeForGraph(id, graph);
+    setGraph((prev) => {
+      return {
+        ...prev,
+        temporaryShapeMap: {
+          ...prev.temporaryShapeMap,
+          [id]: { ...shape },
+        },
+      };
+    });
+  };
+
+  /**
+   * 編集操作が終了すると、graph.temporaryShapeMapの情報がgraph.shapeMapにコピーされ、graph.temporaryShapeMapのデータは削除される。
+   */
+  const commitEdit = (id: number) => {
+    const shape = graph.temporaryShapeMap[id];
+    if (!shape) {
+      console.warn("no temporary shape");
+      return;
+    }
+    const newTemporary = { ...graph.temporaryShapeMap };
+    delete newTemporary[id];
     setGraph((prev) => {
       return {
         ...prev,
         shapeMap: {
           ...prev.shapeMap,
-          [id]: newShape,
+          [id]: { ...shape },
         },
+        temporaryShapeMap: newTemporary,
+      };
+    });
+  };
+
+  /**
+   * なお、編集操作が「キャンセル」された場合は、単にgraph.temporaryShapeMapのデータを削除する(コピーはしない)。
+   */
+  const cancelEdit = (id: number) => {
+    const shape = graph.temporaryShapeMap[id];
+    if (!shape) {
+      console.warn("no temporary entry found");
+      return;
+    }
+    const newTemporary = { ...graph.temporaryShapeMap };
+    delete newTemporary[id];
+    setGraph((prev) => {
+      return {
+        ...prev,
+        temporaryShapeMap: newTemporary,
       };
     });
   };
@@ -195,6 +262,12 @@ export const useGraph = () => {
 
   return {
     graph,
+    getShape,
+    getActualShape,
+    startEdit,
+    commitEdit,
+    cancelEdit,
+
     addRectNode,
     addCircleNode,
     addSegment,
@@ -204,3 +277,4 @@ export const useGraph = () => {
   };
 };
 
+export type GraphUsed = ReturnType<typeof useGraph>;

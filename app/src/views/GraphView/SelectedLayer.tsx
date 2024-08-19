@@ -1,5 +1,5 @@
 import { SvgNodeSelectedShape } from "../../components/graph/SvgGraphShape";
-import { useGraph } from "../../stores/graph";
+import { getShapeForGraph, useGraph } from "../../stores/graph";
 import { DraggableProps } from "../../types/components";
 import { NodeSelection } from "./types";
 
@@ -13,7 +13,7 @@ export const SelectedLayer = (props: {
 
   return <g>
     {props.selectedNodes.ids.map((id) => {
-      const shape = graph.shapeMap[id];
+      const shape = getShapeForGraph(id, graph);
       return <SvgNodeSelectedShape key={shape.id} graph={graph} shape={shape} {...props} />
     })}
   </g>

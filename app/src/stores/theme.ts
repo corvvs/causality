@@ -26,7 +26,7 @@ function loadTheme(): ColorTheme | null {
   if (theme) {
     if (theme === "system") {
       return theme;
-    } else if (actualColorThemes.includes(theme as any)) {
+    } else if ((actualColorThemes as unknown as string[]).includes(theme)) {
       return theme as ColorTheme;
     }
   }
@@ -65,7 +65,7 @@ export const useColorThemeObserver = () => {
     const handler = () => {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const theme = mediaQuery.matches ? 'dark' : 'light';
-      console.log("theme", theme);
+      // console.log("theme", theme);
       setPreferredColorTheme(theme);
     };
     handler();
@@ -76,7 +76,7 @@ export const useColorThemeObserver = () => {
   useEffect(() => {
     if (typeof window === 'undefined') { return; }
     const theme: ColorTheme = loadTheme() || "system";
-    console.log("setting", theme);
+    // console.log("setting", theme);
     setAppColorTheme(theme);
   }, [loadTheme, setAppColorTheme]);
 };

@@ -2,7 +2,7 @@ import { affineApply } from "../../libs/affine";
 import { getPositionForBond, isFullyFree } from "../../libs/segment";
 import { vectorMid } from "../../libs/vector";
 import { useDisplay } from "../../stores/display";
-import { CausalGraph, GraphSegment, Vector } from "../../types";
+import { CausalGraph, GraphSegment, isBondedToShape, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { Reshaper } from "../../views/GraphView/types";
 import { ReshaperCorner } from "./Reshaper";
@@ -15,16 +15,15 @@ const Reshapers = (props: DraggableProps & {
   endCenter: Vector;
 }) => {
   const {
+    shape,
     startCenter, endCenter,
   } = props;
   const handleSize = 12;
-  const centers: Reshaper[] = [
-    { type: "Start", center: startCenter, size: { width: handleSize, height: handleSize } },
-    { type: "End", center: endCenter, size: { width: handleSize, height: handleSize } },
-  ];
-
+  const rs: Reshaper = { type: "Start", center: startCenter, size: { width: handleSize, height: handleSize } };
+  const re: Reshaper = { type: "End", center: endCenter, size: { width: handleSize, height: handleSize } };
   return <>
-    {centers.map((rs) => <ReshaperCorner key={rs.type} reshaper={rs} {...props} />)}
+    {!isBondedToShape(shape.starting) && <ReshaperCorner key={rs.type} reshaper={rs} {...props} />}
+    {!isBondedToShape(shape.ending) && <ReshaperCorner key={re.type} reshaper={re} {...props} />}
   </>
 };
 
@@ -55,7 +54,7 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
   </>;
 };
 
-export const SvgSegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props) => {
+export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props) => {
   const {
     shape,
     graph,
@@ -99,7 +98,7 @@ export const SvgSegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (pr
         if (!props.mouseDown) { return; }
         if (!isFullyFree(shape)) { return; }
         console.log(shape);
-        props.mouseDown(e, { target: "segment", segmentId: shape.id });
+        props.mouseDown(e, { target: "segment", shapeId: shape.id, shape, });
         e.stopPropagation();
       }}
     />

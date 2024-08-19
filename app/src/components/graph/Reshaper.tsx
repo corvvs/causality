@@ -14,7 +14,7 @@ export const ReshaperSide = (props: DraggableProps & {
     width={reshaper.size.width} height={reshaper.size.height}
     onMouseDown={(e) => {
       if (!mouseDown) { return; }
-      mouseDown(e, { target: "reshaper", nodeId: shape.id, resizerType: reshaper.type });
+      mouseDown(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape });
       e.stopPropagation();
     }}
     onClick={(e) => {
@@ -35,7 +35,7 @@ export const ReshaperCorner = (props: DraggableProps & {
     width={reshaper.size.width} height={reshaper.size.height}
     onMouseDown={(e) => {
       if (!mouseDown) { return; }
-      mouseDown(e, { target: "reshaper", nodeId: shape.id, resizerType: reshaper.type });
+      mouseDown(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape });
       e.stopPropagation();
     }}
     onClick={(e) => {

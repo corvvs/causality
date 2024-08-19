@@ -7,9 +7,9 @@ import { ShapeProps } from "./types";
 export const SvgNodeCircleSelectedShape = SvgNodeRectangleLikeSelectedShape;
 
 export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (props) => {
-  const { shape: node } = props;
+  const { shape } = props;
 
-  const basePosition = node.position;
+  const basePosition = shape.position;
   const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;
   return <g
     style={{
@@ -17,23 +17,23 @@ export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (p
     }}
   >
     <ellipse
-      cx={node.size.width / 2} cy={node.size.height / 2}
-      rx={node.size.width / 2}
-      ry={node.size.height / 2}
+      cx={shape.size.width / 2} cy={shape.size.height / 2}
+      rx={shape.size.width / 2}
+      ry={shape.size.height / 2}
       fill="transparent"
-      strokeWidth={node.shape.line.lineWidth}
+      strokeWidth={shape.shape.line.lineWidth}
       onClick={(e) => {
         if (!props.click) { return; }
-        props.click(e, node);
+        props.click(e, shape);
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
         if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "node", nodeId: node.id });
+        props.mouseDown(e, { target: "node", shapeId: shape.id, shape, });
         e.stopPropagation();
       }}
     />
 
-    <SvgNodeInnterText node={node} />
+    <SvgNodeInnterText node={shape} />
   </g>;
 };

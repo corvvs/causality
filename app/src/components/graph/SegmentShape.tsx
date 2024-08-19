@@ -2,7 +2,7 @@ import { affineApply } from "../../libs/affine";
 import { getPositionForBond, isFullyFree } from "../../libs/segment";
 import { vectorMid } from "../../libs/vector";
 import { useDisplay } from "../../stores/display";
-import { CausalGraph, GraphSegment, isBondedToShape, Vector } from "../../types";
+import { CausalGraph, GraphSegment, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { Reshaper } from "../../views/GraphView/types";
 import { ReshaperCorner } from "./Reshaper";
@@ -15,15 +15,14 @@ const Reshapers = (props: DraggableProps & {
   endCenter: Vector;
 }) => {
   const {
-    shape,
     startCenter, endCenter,
   } = props;
   const handleSize = 12;
   const rs: Reshaper = { type: "Start", center: startCenter, size: { width: handleSize, height: handleSize } };
   const re: Reshaper = { type: "End", center: endCenter, size: { width: handleSize, height: handleSize } };
   return <>
-    {!isBondedToShape(shape.starting) && <ReshaperCorner key={rs.type} reshaper={rs} {...props} />}
-    {!isBondedToShape(shape.ending) && <ReshaperCorner key={re.type} reshaper={re} {...props} />}
+    <ReshaperCorner key={rs.type} reshaper={rs} {...props} />
+    <ReshaperCorner key={re.type} reshaper={re} {...props} />
   </>
 };
 

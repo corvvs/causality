@@ -18,16 +18,16 @@ export type Reshaper = {
 };
 
 export const ReshaperCursor = {
-  NW: "cursor-nw-resize",
-  NE: "cursor-ne-resize",
-  SE: "cursor-se-resize",
-  SW: "cursor-sw-resize",
-  N: "cursor-n-resize",
-  E: "cursor-e-resize",
-  S: "cursor-s-resize",
-  W: "cursor-w-resize",
-  Start: "cursor-move",
-  End: "cursor-move",
+  NW: "nw-resize",
+  NE: "ne-resize",
+  SE: "se-resize",
+  SW: "sw-resize",
+  N: "n-resize",
+  E: "e-resize",
+  S: "s-resize",
+  W: "w-resize",
+  Start: "move",
+  End: "move",
 };
 
 export type DraggingTarget = "node" | "field" | null;

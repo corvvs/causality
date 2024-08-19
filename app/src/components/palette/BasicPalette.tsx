@@ -105,7 +105,7 @@ const LinkerSubPalette: ComponentWithProps<{
   return <Button
     className="basic-palette-button p-1"
     onClick={() => {
-      const nodeOrders = graph.orders.filter(id => graph.shapeMap[id].shapeType !== "Segment");
+      const nodeOrders = graph.orders.filter(id => getActualShape(id).shapeType !== "Segment");
       if (nodeOrders.length < 2) { return; }
       const a = getActualShape(nodeOrders[0]);
       const b = getActualShape(nodeOrders[1]);

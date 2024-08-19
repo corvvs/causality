@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
-import { CausalGraph, GraphNode, GraphSegment, isGraphNode, isGraphSegment, Vector } from "../types";
+import { isGraphNode, isGraphSegment, Vector } from "../types";
 import { useOnPinch, useRerenderOnResize } from "../hooks/events";
 import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
@@ -9,207 +9,12 @@ import { DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
-import { MyModifierKey, useModifierKey } from "../stores/modifier_keys";
+import { useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
 import { getPositionForBond, isFullyFree } from "../libs/segment";
+import { reshapeRectangleLikeNode, reshapeSegment } from "./GraphView/reshaping";
 
-function reshapeRectangleLikeNode(props: {
-  shape: GraphNode;
-  rx: number;
-  ry: number;
-  scale: number;
-  draggingInfo: DraggingInfo;
-  modifierKey: MyModifierKey
-  updateNode: (shapeId: number, node: Partial<GraphNode>) => void;
-}) {
-  const {
-    shape: n,
-    rx, ry, scale,
-    draggingInfo,
-    updateNode,
-    modifierKey,
-  } = props;
-  if (draggingInfo.target !== "reshaper") { return; }
-  if (!draggingInfo.origin) { return; }
-  const xTo = rx / scale;
-  const yTo = ry / scale;
-  switch (draggingInfo.resizerType) {
-    case "N": {
-      const yFrom = n.position.y + n.size.height;
-      let w = n.size.width;
-      let h = yFrom - yTo
-      if (modifierKey.shift) {
-        w = h;
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dw = w - n.size.width;
-      const dh = h - n.size.height;
-      updateNode(n.id, {
-        position: { x: n.position.x - dw / 2, y: n.position.y - dh },
-        size: { width: w, height: h }
-      });
-      break;
-    }
-    case "E": {
-      let w = xTo - n.position.x;
-      let h = n.size.height;
-      if (modifierKey.shift) {
-        h = w;
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dh = h - n.size.height;
-      updateNode(n.id, {
-        position: { x: n.position.x, y: n.position.y - dh / 2 },
-        size: { width: w, height: h },
-      });
-      break;
-    }
-    case "S": {
-      let w = n.size.width;
-      let h = yTo - n.position.y;
-      if (modifierKey.shift) {
-        w = h;
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dw = w - n.size.width;
-      updateNode(n.id, {
-        position: { x: n.position.x - dw / 2, y: n.position.y },
-        size: { width: w, height: h }
-      });
-      break;
-    }
-    case "W": {
-      const xFrom = n.position.x + n.size.width;
-      let w = xFrom - xTo
-      let h = n.size.height;
-      if (modifierKey.shift) {
-        h = w;
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dw = w - n.size.width;
-      const dh = h - n.size.height;
-      updateNode(n.id, {
-        position: { x: n.position.x - dw, y: n.position.y - dh / 2 },
-        size: { width: w, height: h }
-      });
-      break;
-    }
-    case "NW": {
-      const xFrom = n.position.x + n.size.width;
-      const yFrom = n.position.y + n.size.height;
-      let w = xFrom - xTo;
-      let h = yFrom - yTo
-      if (modifierKey.shift) {
-        if (w > h) { h = w; }
-        if (h > w) { w = h; }
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dw = w - n.size.width;
-      const dh = h - n.size.height;
-      updateNode(n.id, {
-        position: { x: n.position.x - dw, y: n.position.y - dh },
-        size: { width: w, height: h }
-      });
-      break;
-    }
-    case "NE": {
-      let w = xTo - n.position.x;
-      let h = n.size.height - (yTo - n.position.y);
-      if (modifierKey.shift) {
-        if (w > h) { h = w; }
-        if (h > w) { w = h; }
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dh = h - n.size.height;
-      updateNode(n.id, {
-        position: { x: n.position.x, y: n.position.y - dh },
-        size: { width: w, height: h }
-      });
-      break;
-    }
-    case "SW": {
-      let w = n.size.width - (xTo - n.position.x);
-      let h = yTo - n.position.y;
-      if (modifierKey.shift) {
-        if (w > h) { h = w; }
-        if (h > w) { w = h; }
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      const dw = w - n.size.width;
-      updateNode(n.id, {
-        position: { x: n.position.x - dw, y: n.position.y },
-        size: { width: w, height: h }
-      });
-      break;
-    }
-    case "SE": {
-      let w = xTo - n.position.x;
-      let h = yTo - n.position.y;
-      if (modifierKey.shift) {
-        if (w > h) { h = w; }
-        if (h > w) { w = h; }
-      }
-      if (w < 0) { w = 0; }
-      if (h < 0) { h = 0; }
-      if (w <= 0 && h <= 0) { return; }
-      updateNode(n.id, { size: { width: w, height: h } });
-      break;
-    }
-  }
-}
 
-function reshapeSegment(props: {
-  shape: GraphSegment;
-  rx: number;
-  ry: number;
-  scale: number;
-  draggingInfo: DraggingInfo;
-  modifierKey: MyModifierKey;
-  graph: CausalGraph;
-  updateSegment: (id: number, node: Partial<GraphSegment>) => void;
-}) {
-  const {
-    shape: n,
-    rx, ry, scale,
-    draggingInfo,
-    updateSegment,
-  } = props;
-  if (draggingInfo.target !== "reshaper") { return; }
-  if (!draggingInfo.origin) { return; }
-  switch (draggingInfo.resizerType) {
-    case "Start": {
-      const x = rx / scale;
-      const y = ry / scale;
-      updateSegment(n.id, {
-        starting: { x, y }
-      });
-      break;
-    }
-    case "End": {
-      const x = rx / scale;
-      const y = ry / scale;
-      updateSegment(n.id, {
-        ending: { x, y }
-      });
-      break;
-    }
-
-  }
-}
 
 export const GraphView = () => {
   const {
@@ -249,7 +54,6 @@ export const GraphView = () => {
   const style = {
     ...cursor,
   };
-
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -311,6 +115,7 @@ export const GraphView = () => {
         }
       }
     };
+
     const handleMouseUp = () => {
       switch (draggingInfo.target) {
         case "node": {
@@ -338,8 +143,8 @@ export const GraphView = () => {
           break;
         }
       }
-
     };
+
     const handleMouseDown = (event: MouseEvent) => {
       if (draggingInfo.target !== "field") { return; }
       // フィールド自体のドラッグを行う
@@ -362,7 +167,7 @@ export const GraphView = () => {
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mousedown', handleMouseDown);
     };
-  });
+  }, [draggingInfo, scale, display, updateNode, updateSegment, getShape, moveOrigin, getActualShape, commitEdit, modifierKey, graph]);
 
   useOnPinch({
     onPinchZoom: (e) => {
@@ -442,7 +247,6 @@ export const GraphView = () => {
                 case "segment": {
                   if (draggingInfo.target === "segment") { return; }
                   const segment = getActualShape(draggableMatter.shapeId);
-                  console.log(segment);
                   if (!isGraphSegment(segment)) { return; }
                   if (!isFullyFree(segment)) { return; }
                   const s = getPositionForBond(segment.starting, graph);
@@ -521,6 +325,7 @@ export const GraphView = () => {
                   break;
                 }
               }
+              startEdit(draggableMatter.shapeId);
               setDraggingInfo({
                 ...draggableMatter,
                 origin,

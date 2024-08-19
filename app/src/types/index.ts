@@ -35,7 +35,7 @@ type LineShape = {
 
 type NodeShapeType = "Rectangle" | "Circle";
 type ShapeType = NodeShapeType | "Segment";
-type ShapeId = number;
+export type ShapeId = number;
 
 
 export type GraphShape = GenericFields & AppearanceFields & {

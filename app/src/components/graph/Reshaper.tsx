@@ -9,7 +9,8 @@ export const ReshaperSide = (props: DraggableProps & {
   const { reshaper, shape, mouseDown } = props;
   return <rect
     key={reshaper.type}
-    className={`reshaper-side ${ReshaperCursor[reshaper.type]!} stroke-transparent fill-transparent`}
+    className={`reshaper-side stroke-transparent fill-transparent`}
+    style={{ cursor: ReshaperCursor[reshaper.type] }}
     x={reshaper.center.x - reshaper.size.width / 2} y={reshaper.center.y - reshaper.size.height / 2}
     width={reshaper.size.width} height={reshaper.size.height}
     onMouseDown={(e) => {
@@ -30,7 +31,8 @@ export const ReshaperCorner = (props: DraggableProps & {
   const { reshaper, shape, mouseDown } = props;
   return <rect
     key={reshaper.type}
-    className={`reshaper-corner ${ReshaperCursor[reshaper.type]} stroke-1 hover:fill-blue-400`}
+    className={`reshaper-corner stroke-1 hover:fill-blue-400`}
+    style={{ cursor: ReshaperCursor[reshaper.type] }}
     x={reshaper.center.x - reshaper.size.width / 2} y={reshaper.center.y - reshaper.size.height / 2}
     width={reshaper.size.width} height={reshaper.size.height}
     onMouseDown={(e) => {

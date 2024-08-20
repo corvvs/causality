@@ -53,6 +53,14 @@ export function isGraphNode(shape: GraphShape): shape is GraphNode {
   return shape.shapeType === "Rectangle" || shape.shapeType === "Circle";
 }
 
+export function isRectangleNode(shape: GraphShape): shape is RectangleNode {
+  return shape.shapeType === "Rectangle";
+}
+
+export function isCircleNode(shape: GraphShape): shape is CircleNode {
+  return shape.shapeType === "Circle";
+}
+
 export function isGraphSegment(shape: GraphShape): shape is GraphSegment {
   return shape.shapeType === "Segment";
 }

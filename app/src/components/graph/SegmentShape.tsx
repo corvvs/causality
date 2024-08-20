@@ -1,6 +1,5 @@
 import { affineApply } from "../../libs/affine";
-import { getPositionForBond, isFullyFree } from "../../libs/segment";
-import { vectorMid } from "../../libs/vector";
+import { getPositionForTerminus, isFullyFree } from "../../libs/segment";
 import { useDisplay } from "../../stores/display";
 import { CausalGraph, GraphSegment, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
@@ -35,10 +34,9 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
     affineFieldToTag,
   } = useDisplay();
 
-  const startCenter = getPositionForBond(shape.starting, graph);
-  const endCenter = getPositionForBond(shape.ending, graph);
-  const rStart = affineApply(affineFieldToTag, startCenter);
-  const rEnd = affineApply(affineFieldToTag, endCenter);
+  const centers = getPositionForTerminus(shape, graph);
+  const rStart = affineApply(affineFieldToTag, centers.starting);
+  const rEnd = affineApply(affineFieldToTag, centers.ending);
   return <>
     <line
       className="segment-selection-box pointer-events-none"
@@ -59,33 +57,24 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
     graph,
   } = props;
 
-  const startCenter = getPositionForBond(shape.starting, graph);
-  const endCenter = getPositionForBond(shape.ending, graph);
-
-  const center = vectorMid(startCenter, endCenter);
-  const basePosition = center;
-  const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;
+  const centers = getPositionForTerminus(shape, graph);
 
   const lineWidth = 1;
   const margin = lineWidth + 5;
-  return <g
-    style={{
-      transform: baseTranslation,
-    }}
-  >
+  return <g>
     <line
-      x1={startCenter.x - center.x}
-      y1={startCenter.y - center.y}
-      x2={endCenter.x - center.x}
-      y2={endCenter.y - center.y}
+      x1={centers.starting.x}
+      y1={centers.starting.y}
+      x2={centers.ending.x}
+      y2={centers.ending.y}
       strokeWidth={lineWidth}
     />
     <line
       className="hit-target"
-      x1={startCenter.x - center.x}
-      y1={startCenter.y - center.y}
-      x2={endCenter.x - center.x}
-      y2={endCenter.y - center.y}
+      x1={centers.starting.x}
+      y1={centers.starting.y}
+      x2={centers.ending.x}
+      y2={centers.ending.y}
       strokeWidth={margin}
       onClick={(e) => {
         if (!props.click) { return; }

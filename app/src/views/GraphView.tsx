@@ -11,7 +11,7 @@ import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
 import { useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
-import { getPositionForBond, isFullyFree } from "../libs/segment";
+import { getPositionForTerminus, isFullyFree } from "../libs/segment";
 import { reshapeRectangleLikeNode, reshapeSegment } from "./GraphView/reshaping";
 
 
@@ -82,8 +82,9 @@ export const GraphView = () => {
           if (!isFullyFree(n)) { return; }
           const xTo = rx / scale;
           const yTo = ry / scale;
-          const rs = getPositionForBond(n.starting, graph);
-          const re = getPositionForBond(n.ending, graph);
+          const r = getPositionForTerminus(n, graph);
+          const rs = r.starting;
+          const re = r.ending;
           const dx = xTo - rs.x;
           const dy = yTo - rs.y;
           updateSegment(n.id, {
@@ -152,7 +153,7 @@ export const GraphView = () => {
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [draggingInfo, commitEdit, getShape, getActualShape]);
+  }, [draggingInfo, commitEdit]);
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
@@ -253,7 +254,7 @@ export const GraphView = () => {
                   const segment = getActualShape(draggableMatter.shapeId);
                   if (!isGraphSegment(segment)) { return; }
                   if (!isFullyFree(segment)) { return; }
-                  const s = getPositionForBond(segment.starting, graph);
+                  const s = getPositionForTerminus(segment, graph).starting;
                   startEdit(draggableMatter.shapeId);
                   setDraggingInfo({
                     ...draggableMatter,
@@ -317,14 +318,15 @@ export const GraphView = () => {
               });
             } else if (isGraphSegment(node)) {
               let origin: Vector = { x: 0, y: 0 };
+              const rr = getPositionForTerminus(node, graph);
               switch (draggableMatter.resizerType) {
                 case "Start": {
-                  const r = getPositionForBond(node.starting, graph);
+                  const r = rr.starting;
                   origin = { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, };
                   break;
                 }
                 case "End": {
-                  const r = getPositionForBond(node.ending, graph);
+                  const r = rr.ending;
                   origin = { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, };
                   break;
                 }

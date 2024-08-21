@@ -29,7 +29,7 @@ type GenericFields = {
 /**
  * 一般的な線の形状情報
  */
-type LineShape = {
+export type LineAppearance = {
   lineWidth: number;
 };
 
@@ -66,7 +66,7 @@ export function isGraphSegment(shape: GraphShape): shape is GraphSegment {
 }
 
 type RectangleLikeShape = {
-  line: LineShape;
+  line: LineAppearance;
 };
 
 type RectangleShape = RectangleLikeShape;
@@ -97,6 +97,9 @@ export type GraphSegment = GraphShape & {
   shapeType: "Segment";
   starting: SegmentBond;
   ending: SegmentBond;
+  shape: {
+    line: LineAppearance;
+  };
   z: number;
 };
 

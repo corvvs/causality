@@ -59,7 +59,7 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
 
   const centers = getPositionForTerminus(shape, graph);
 
-  const lineWidth = 1;
+  const lineWidth = shape.shape.line.lineWidth;
   const margin = lineWidth + 5;
   return <g>
     <line

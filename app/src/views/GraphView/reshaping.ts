@@ -51,6 +51,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dw = w - n.size.width;
       const dh = h - n.size.height;
       updateNode(n.id, {
@@ -68,6 +70,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dh = h - n.size.height;
       updateNode(n.id, {
         position: { x: n.position.x, y: n.position.y - dh / 2 },
@@ -84,6 +88,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dw = w - n.size.width;
       updateNode(n.id, {
         position: { x: n.position.x - dw / 2, y: n.position.y },
@@ -101,6 +107,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dw = w - n.size.width;
       const dh = h - n.size.height;
       updateNode(n.id, {
@@ -121,6 +129,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dw = w - n.size.width;
       const dh = h - n.size.height;
       updateNode(n.id, {
@@ -139,6 +149,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dh = h - n.size.height;
       updateNode(n.id, {
         position: { x: n.position.x, y: n.position.y - dh },
@@ -156,6 +168,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       const dw = w - n.size.width;
       updateNode(n.id, {
         position: { x: n.position.x - dw, y: n.position.y },
@@ -173,6 +187,8 @@ export function reshapeRectangleLikeNode(props: {
       if (w < 0) { w = 0; }
       if (h < 0) { h = 0; }
       if (w <= 0 && h <= 0) { return; }
+      if (h <= 0) { h = 1; }
+      if (w <= 0) { w = 1; }
       updateNode(n.id, { size: { width: w, height: h } });
       break;
     }

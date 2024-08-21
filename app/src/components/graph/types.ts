@@ -7,4 +7,6 @@ export type CommonProps<N extends GraphShape> = {
   graph: CausalGraph;
 };
 
-export type ShapeProps<N extends GraphShape> = CommonProps<N> & DraggableProps & SelectiveProps;
+export type ShapeProps<N extends GraphShape> = CommonProps<N>
+  & DraggableProps 
+  & SelectiveProps;

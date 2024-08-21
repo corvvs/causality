@@ -4,7 +4,7 @@ import { useDisplay } from "../../stores/display";
 import { CausalGraph, GraphSegment, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { Reshaper } from "../../views/GraphView/types";
-import { ReshaperCorner } from "./Reshaper";
+import { ReshaperHandleCorner } from "./ReshapeHandle";
 import { ShapeProps } from "./types";
 
 
@@ -20,8 +20,8 @@ const Reshapers = (props: DraggableProps & {
   const rs: Reshaper = { type: "Start", center: startCenter, size: { width: handleSize, height: handleSize } };
   const re: Reshaper = { type: "End", center: endCenter, size: { width: handleSize, height: handleSize } };
   return <>
-    <ReshaperCorner key={rs.type} reshaper={rs} {...props} />
-    <ReshaperCorner key={re.type} reshaper={re} {...props} />
+    <ReshaperHandleCorner key={rs.type} reshaper={rs} {...props} />
+    <ReshaperHandleCorner key={re.type} reshaper={re} {...props} />
   </>
 };
 
@@ -60,7 +60,7 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
   const centers = getPositionForTerminus(shape, graph);
 
   const lineWidth = shape.shape.line.lineWidth;
-  const margin = lineWidth + 5;
+  const margin = lineWidth + 10;
   return <g>
     <line
       x1={centers.starting.x}
@@ -77,16 +77,16 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
       y2={centers.ending.y}
       strokeWidth={margin}
       onClick={(e) => {
-        if (!props.click) { return; }
-        props.click(e, shape);
+        if (!props.clickForSelection) { return; }
+        props.clickForSelection(e, shape);
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
         console.log("mouseDown");
-        if (!props.mouseDown) { return; }
+        if (!props.mouseDownForDragging) { return; }
         if (!isFullyFree(shape)) { return; }
         console.log(shape);
-        props.mouseDown(e, { target: "segment", shapeId: shape.id, shape, });
+        props.mouseDownForDragging(e, { target: "segment", shapeId: shape.id, shape, });
         e.stopPropagation();
       }}
     />

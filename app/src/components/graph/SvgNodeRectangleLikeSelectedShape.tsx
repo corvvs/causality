@@ -1,9 +1,9 @@
 import { affineApply } from "../../libs/affine";
 import { useDisplay } from "../../stores/display";
 import { RectangleLikeNode, Vector } from "../../types";
-import { ComponentWithProps, DraggableProps } from "../../types/components";
-import { Reshaper } from "../../views/GraphView/types";
-import { ReshaperCorner, ReshaperSide } from "./Reshaper";
+import { ComponentWithProps, DraggableProps, LinkingProps } from "../../types/components";
+import { Linker, Reshaper } from "../../views/GraphView/types";
+import { ReshaperHandleCorner, ReshapeHandleSide, LinkHandle } from "./ReshapeHandle";
 
 
 const Reshapers = (props: DraggableProps & {
@@ -34,20 +34,41 @@ const Reshapers = (props: DraggableProps & {
   ];
 
   return <>
-    {centers1.map((rs) => <ReshaperSide key={rs.type} reshaper={rs} {...props} />)}
-    {centers2.map((rs) => <ReshaperCorner key={rs.type} reshaper={rs} {...props} />)}
+    {centers1.map((rs) => <ReshapeHandleSide key={rs.type} reshaper={rs} {...props} />)}
+    {centers2.map((rs) => <ReshaperHandleCorner key={rs.type} reshaper={rs} {...props} />)}
   </>;
 };
 
-// const Linkers = (props: DraggableProps & {
-//   node: RectangleLikeNode;
-//   rNorthWest: Vector;
-//   rSouthEast: Vector;
-// }) => {
+const LinkHandles = (props: LinkingProps & {
+  rNorthWest: Vector;
+  rSouthEast: Vector;
+  shape: RectangleLikeNode;
+  scale: number;
+}) => {
 
-// };
+  const {
+    rNorthWest,
+    rSouthEast,
+  } = props;
 
-export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<{ shape: RectangleLikeNode } & DraggableProps> = (props) => {
+  const handleRadius = 5;
+  const margin = 20;
+
+  const centers: Linker[] = [
+    { type: "N", center: { x: (rNorthWest.x + rSouthEast.x) / 2, y: rNorthWest.y - margin }, radius: handleRadius },
+    { type: "W", center: { x: rNorthWest.x - margin, y: (rNorthWest.y + rSouthEast.y) / 2 }, radius: handleRadius },
+    { type: "S", center: { x: (rNorthWest.x + rSouthEast.x) / 2, y: rSouthEast.y + margin }, radius: handleRadius },
+    { type: "E", center: { x: rSouthEast.x + margin, y: (rNorthWest.y + rSouthEast.y) / 2 }, radius: handleRadius },
+  ];
+
+  return <>
+    {centers.map((rs) => <LinkHandle key={rs.type} linker={rs} {...props} />)}
+  </>;
+};
+
+export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<
+  { shape: RectangleLikeNode } & DraggableProps & LinkingProps
+> = (props) => {
   const { shape } = props;
   const {
     scale,
@@ -73,5 +94,6 @@ export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<{ shape: Rect
       strokeWidth={1.5}
     />
     <Reshapers {...props} rNorthWest={rNorthWest} rSouthEast={rSouthEast} />
+    <LinkHandles {...props} rNorthWest={rNorthWest} rSouthEast={rSouthEast} scale={scale} />
   </>;
 };

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useGraph } from "../stores/graph";
 import { useDisplay } from "../stores/display";
-import { isGraphNode, isGraphSegment, Vector } from "../types";
+import { isGraphNode, isGraphSegment, ShapeId, Vector } from "../types";
 import { useOnPinch, useRerenderOnResize } from "../hooks/events";
 import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
-import { DraggingInfo, NodeSelection } from "./GraphView/types";
+import { DraggableMatter, DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { NodeEditView } from "./GraphView/NodeEditView";
 import { SystemView } from "./GraphView/SystemView";
@@ -13,11 +13,13 @@ import { useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
 import { getPositionForTerminus, isFullyFree } from "../libs/segment";
 import { reshapeRectangleLikeNode, reshapeSegment } from "./GraphView/reshaping";
+import { affineApply } from "../libs/affine";
 
 
 
 export const GraphView = () => {
   const {
+    addSegment,
     updateNode,
     updateSegment,
     getShape,
@@ -32,6 +34,7 @@ export const GraphView = () => {
     moveOrigin,
     changeScale,
     transformFieldToBrowser,
+    affineTagToField,
   } = useDisplay();
 
   const {
@@ -45,6 +48,14 @@ export const GraphView = () => {
     ids: [],
     set: {},
   });
+  const addNodeSelection = (id: ShapeId) => {
+    setSelectedNodes(() => {
+      return {
+        ids: [id],
+        set: { [id]: true },
+      };
+    });
+  };
   const [draggingInfo, setDraggingInfo] = useState<DraggingInfo>({
     target: null,
   });
@@ -227,7 +238,7 @@ export const GraphView = () => {
           <NodeGroup
             selectedNodes={selectedNodes}
             graph={graph}
-            click={(_, node) => {
+            clickForSelection={(_, node) => {
               if (!selectedNodes.set[node.id]) {
                 setSelectedNodes(() => {
                   return {
@@ -238,7 +249,7 @@ export const GraphView = () => {
               }
             }}
 
-            mouseDown={(e, draggableMatter) => {
+            mouseDownForDragging={(e, draggableMatter) => {
               // ノードのムーブ開始処理
               switch (draggableMatter.target) {
                 case "node": {
@@ -272,9 +283,10 @@ export const GraphView = () => {
             }}
           />
         </g>
+
         <SelectedLayer
           selectedNodes={selectedNodes}
-          mouseDown={(e, draggableMatter) => {
+          mouseDownForDragging={(e, draggableMatter) => {
             if (draggableMatter.target !== "reshaper") { return; }
             const node = getShape(draggableMatter.shapeId);
             if (isGraphNode(node)) {
@@ -347,6 +359,40 @@ export const GraphView = () => {
                 operation: "Reshape",
               });
             }
+          }}
+
+          mouseDownForLinking={(e, shape) => {
+            // TODO:
+            // - 新しいセグメントを作成する
+            //   - starting はこのシェイプになる
+            // - セグメントを選択状態にする
+            // - セグメントのendingをリシェーピングしている状態にする
+            const rTag: Vector = { x: e.clientX, y: e.clientY };
+            console.log("rTag", rTag)
+            const rField = affineApply(affineTagToField, rTag);
+
+            const segment = addSegment(
+              rTag,
+              (segment) => {
+                segment.starting = shape.id;
+                segment.ending = rField;
+                return segment;
+              }
+            );
+            addNodeSelection(segment.id);
+            startEdit(segment.id);
+            const draggableMatter: DraggableMatter = {
+              target: "reshaper",
+              shapeId: segment.id,
+              resizerType: "End",
+              shape: segment,
+            };
+            setDraggingInfo({
+              ...draggableMatter,
+              origin: { x: e.clientX - rField.x * scale, y: e.clientY - rField.y * scale, },
+              operation: "Move",
+            });
+            console.log("[mouseDownForLinking]", e, shape);
           }}
         />
       </svg>

@@ -14,17 +14,17 @@ export const NodeGroup: ComponentWithProps<
     const {
       graph,
     } = useGraph();
-
     return <>
       {
         graph.orders.map(id => {
           const shape = getShapeForGraph(id, graph);
+          if (!shape) { return null; }
           return <SvgGraphShape
             key={shape.id}
             shape={shape}
             isSelected={!!props.selectedNodes.set[shape.id]}
-            click={props.click}
-            mouseDown={props.mouseDown}
+            clickForSelection={props.clickForSelection}
+            mouseDownForDragging={props.mouseDownForDragging}
             graph={graph}
           />;
         })

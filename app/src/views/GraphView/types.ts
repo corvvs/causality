@@ -1,6 +1,7 @@
 import { GraphNode, GraphSegment, GraphShape, Size, Vector } from "../../types";
 
 export type ReshaperType = "NW" | "NE" | "SE" | "SW" | "N" | "E" | "S" | "W" | "Start" | "End";
+export type LinkerType = "N" | "E" | "S" | "W";
 
 /**
  * リサイザー要素の物理情報
@@ -29,6 +30,19 @@ export const ReshaperCursor = {
   Start: "move",
   End: "move",
 };
+
+export type Linker = {
+  /**
+   * 中心位置(in タグワールド)
+   */
+  center: Vector;
+  /**
+   * 半径(in タグワールド)
+   */
+  radius: number;
+  type: LinkerType;
+};
+
 
 export type DraggingTarget = "node" | "field" | null;
 

@@ -12,7 +12,6 @@ import { TbCircle, TbSquare, TbSquares } from "react-icons/tb"
 import { useDisplay } from "../../stores/display"
 import { affineApply } from "../../libs/affine"
 import { useGraph } from "../../stores/graph"
-import { GoArrowUpRight } from "react-icons/go"
 import { PiLineSegment } from "react-icons/pi"
 
 const getIconTypeForColorTheme = (colorTheme: ColorTheme) => {
@@ -93,30 +92,6 @@ const ShapesSubPalette: ComponentWithProps<{
   </Popover>
 };
 
-
-const LinkerSubPalette: ComponentWithProps<{
-  getCenter: () => Vector;
-}> = () => {
-  const {
-    graph,
-    linkUpNodes,
-    getActualShape,
-  } = useGraph();
-  return <Button
-    className="basic-palette-button p-1"
-    onClick={() => {
-      const nodeOrders = graph.orders.filter(id => getActualShape(id).shapeType !== "Segment");
-      if (nodeOrders.length < 2) { return; }
-      const a = getActualShape(nodeOrders[0]);
-      const b = getActualShape(nodeOrders[1]);
-      console.log(a, b);
-      linkUpNodes(a.id, b.id);
-    }}
-  >
-    <InlineIcon i={<GoArrowUpRight className="w-6 h-6" />} />
-  </Button>
-}
-
 const ScaleSubPalette: ComponentWithProps<{
   getCenter: () => Vector;
 }> = (props) => {
@@ -165,10 +140,6 @@ export const BasicPalette: ComponentWithProps<{
     <div className="grid grid-cols-1 grid-flow-row gap-2 p-1 pb-4">
       <div title="Add a Shape">
         <ShapesSubPalette getCenter={props.getCenter} />
-      </div>
-
-      <div title="Link some shapes">
-        <LinkerSubPalette getCenter={props.getCenter} />
       </div>
 
       <div title="Zooming">

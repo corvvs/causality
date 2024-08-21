@@ -23,13 +23,13 @@ export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (p
       fill="transparent"
       strokeWidth={shape.shape.line.lineWidth}
       onClick={(e) => {
-        if (!props.click) { return; }
-        props.click(e, shape);
+        if (!props.clickForSelection) { return; }
+        props.clickForSelection(e, shape);
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
-        if (!props.mouseDown) { return; }
-        props.mouseDown(e, { target: "node", shapeId: shape.id, shape, });
+        if (!props.mouseDownForDragging) { return; }
+        props.mouseDownForDragging(e, { target: "node", shapeId: shape.id, shape, });
         e.stopPropagation();
       }}
     />

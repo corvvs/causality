@@ -120,9 +120,13 @@ export const useGraph = () => {
     return nn;
   };
 
-  const addSegment = (position: Vector) => {
+  const addSegment = (position: Vector, modifier?: (segment: GraphSegment) => GraphSegment) => {
     const newIndex = graph.index + 1;
-    const nn = newSegment(newIndex, position);
+    let nn = newSegment(newIndex, position);
+    if (modifier) {
+      nn = modifier(nn);
+    }
+    console.log("addSegment", nn);
     setGraph((prev) => {
       return {
         index: newIndex,
@@ -134,6 +138,7 @@ export const useGraph = () => {
         orders: [...prev.orders, nn.id],
       };
     });
+    return nn;
   }
 
   /**
@@ -231,8 +236,8 @@ export const useGraph = () => {
       console.warn("detected unexpected temporary entry");
       return;
     }
-    const shape = getActualShapeForGraph(id, graph);
     setGraph((prev) => {
+      const shape = getActualShapeForGraph(id, prev);
       return {
         ...prev,
         temporaryShapeMap: {

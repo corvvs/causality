@@ -1,12 +1,12 @@
-import { GraphShape } from "../../types";
-import { DraggableProps } from "../../types/components";
-import { Reshaper, ReshaperCursor } from "../../views/GraphView/types";
+import { GraphShape, RectangleLikeNode } from "../../types";
+import { DraggableProps, LinkingProps } from "../../types/components";
+import { Linker, Reshaper, ReshaperCursor } from "../../views/GraphView/types";
 
-export const ReshaperSide = (props: DraggableProps & {
+export const ReshapeHandleSide = (props: DraggableProps & {
   shape: GraphShape;
   reshaper: Reshaper;
 }) => {
-  const { reshaper, shape, mouseDown } = props;
+  const { reshaper, shape, mouseDownForDragging: mouseDown } = props;
   return <rect
     key={reshaper.type}
     className={`reshaper-side stroke-transparent fill-transparent`}
@@ -24,11 +24,11 @@ export const ReshaperSide = (props: DraggableProps & {
   />
 }
 
-export const ReshaperCorner = (props: DraggableProps & {
+export const ReshaperHandleCorner = (props: DraggableProps & {
   shape: GraphShape;
   reshaper: Reshaper;
 }) => {
-  const { reshaper, shape, mouseDown } = props;
+  const { reshaper, shape, mouseDownForDragging: mouseDown } = props;
   return <rect
     key={reshaper.type}
     className={`reshaper-corner stroke-1 hover:fill-blue-400`}
@@ -45,3 +45,26 @@ export const ReshaperCorner = (props: DraggableProps & {
     }}
   />
 }
+
+export const LinkHandle = (props: LinkingProps & {
+  shape: RectangleLikeNode;
+  scale: number;
+  linker: Linker;
+}) => {
+  const { linker, mouseDownForLinking, shape } = props;
+
+  return <circle
+    key={linker.type}
+    className={`linker stroke-1`}
+    cx={linker.center.x} cy={linker.center.y}
+    r={linker.radius}
+    onMouseDown={(e) => {
+      if (!mouseDownForLinking) { return; }
+      mouseDownForLinking(e, shape);
+      e.stopPropagation();
+    }}
+    onClick={(e) => {
+      e.stopPropagation();
+    }}
+  />
+};

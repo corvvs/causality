@@ -1,5 +1,5 @@
 import { CausalGraph, CircleNode, GraphSegment, GraphShape, RectangleNode } from "../../types";
-import { ComponentWithProps, DraggableProps, SelectiveProps } from "../../types/components";
+import { ComponentWithProps, DraggableProps, LinkingProps, SelectiveProps } from "../../types/components";
 import { SvgNodeCircleSelectedShape, SvgNodeCircleShape } from "./SvgNodeCircleShape";
 import { SvgNodeRectangleSelectedShape, SvgNodeRectangleShape } from "./SvgNodeRectangleShape";
 import { SvgSegmentSelectedShape, SegmentShape } from "./SegmentShape";
@@ -18,7 +18,10 @@ export const SvgGraphShape: ComponentWithProps<CommonProps<GraphShape> & Draggab
   }
 };
 
-export const SvgNodeSelectedShape: ComponentWithProps<{ shape: GraphShape; graph: CausalGraph } & DraggableProps> = (props) => {
+export const SvgNodeSelectedShape: ComponentWithProps<
+  { shape: GraphShape; graph: CausalGraph } &
+  DraggableProps & LinkingProps
+> = (props) => {
   switch (props.shape.shapeType) {
     case "Rectangle":
       return <SvgNodeRectangleSelectedShape {...props} shape={props.shape as RectangleNode} />;

@@ -802,7 +802,7 @@ video {
   --background-key-3: #e3d0e7;
   --background-key-4: #d1d7e7;
   --background-textarea: #e3e8e8;
-  --matched-foreground: #2a86d6;
+  --ui-hover: #2a86d6;
   --matched-row: #d2e1ee;
   --narrowing-base: #9e62f3;
   --selected-row: #c6f1c8;
@@ -916,6 +916,18 @@ ellipse {
   stroke: royalblue;
 }
 
+.reshaper-corner {
+  fill: var(--background);
+}
+
+.linker {
+  stroke: royalblue;
+  fill: var(--foreground);
+  &:hover {
+    fill: var(--ui-hover);
+  }
+}
+
 .system-box {
   border-color: lightgreen;
   background-color: var(--background-75);
@@ -958,10 +970,6 @@ ellipse {
 .node-palette {
   border-width: 0.25rem;
   border-color: royalblue;
-}
-
-.reshaper-corner {
-  fill: var(--background);
 }
 
 .color-picker {

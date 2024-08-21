@@ -172,7 +172,7 @@ export const useGraph = () => {
   const updateNode = (shapeId: number, shape: Partial<GraphNode>) => {
     const s = graph.temporaryShapeMap[shapeId];
     if (!s) {
-      console.warn("no temporary entry found");
+      console.warn(`[updateNode] no temporary entry found for shapeId: ${shapeId}`);
       return;
     }
     const newNode = { ...s, ...shape };
@@ -187,10 +187,28 @@ export const useGraph = () => {
     });
   };
 
+  const updateNodeDirectly = (shapeId: number, shape: Partial<GraphNode>) => {
+    const s = graph.shapeMap[shapeId];
+    if (!s) {
+      console.warn(`[updateNode] no entry found for shapeId: ${shapeId}`);
+      return;
+    }
+    const newNode = { ...s, ...shape };
+    setGraph((prev) => {
+      return {
+        ...prev,
+        shapeMap: {
+          ...prev.shapeMap,
+          [shapeId]: newNode,
+        },
+      };
+    });
+  };
+
   const updateSegment = (shapeId: number, shape: Partial<GraphSegment>) => {
     const s = graph.temporaryShapeMap[shapeId];
     if (!s) {
-      console.warn("no temporary entry found");
+      console.warn("[updateSegment] no temporary entry found");
       return;
     }
     const newShape = { ...s, ...shape };
@@ -280,6 +298,7 @@ export const useGraph = () => {
     addCircleNode,
     addSegment,
     updateNode,
+    updateNodeDirectly,
     updateSegment,
     linkUpNodes,
   };

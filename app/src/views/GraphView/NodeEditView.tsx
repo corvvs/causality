@@ -11,13 +11,13 @@ export const NodeEditView = (props: {
 
   const {
     graph,
-    updateNode,
+    updateNodeDirectly,
   } = useGraph();
   const node = getShapeForGraph(firstId, graph);
 
   const color = node.labelColor || null;
   const setColor = (v: ColorValue | null) => {
-    updateNode(firstId, {
+    updateNodeDirectly(firstId, {
       labelColor: v || undefined,
     });
   };
@@ -36,7 +36,7 @@ export const NodeEditView = (props: {
           type="text"
           value={node.label || ""}
           onChange={(e) => {
-            updateNode(firstId, {
+            updateNodeDirectly(firstId, {
               label: e.target.value
             });
           }}

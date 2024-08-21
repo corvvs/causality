@@ -54,9 +54,12 @@ export type DraggableMatter = {
   target: "field";
 };
 
+type DraggingOperation = "Move" | "Reshape";
+
 export type DraggingInfo = {
   target: null;
 } | (DraggableMatter & {
+  operation: DraggingOperation;
   origin: Vector;
   size?: Size;
 });

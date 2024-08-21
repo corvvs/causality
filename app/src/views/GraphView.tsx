@@ -55,7 +55,7 @@ export const GraphView = () => {
   };
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMoveOnDocument = (event: MouseEvent) => {
       if (!draggingInfo.target) { return; }
       if (!draggingInfo.origin) { return; }
 
@@ -116,15 +116,20 @@ export const GraphView = () => {
       }
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMoveOnDocument);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousemove', handleMouseMoveOnDocument);
     };
   }, [draggingInfo, scale, updateNode, updateSegment, getShape, graph, moveOrigin, modifierKey]);
 
   useEffect(() => {
-    const handleMouseUp = () => {
+    const handleMouseUpOnDocument = () => {
+      // ドラッグムーブ終了処理
+      if (draggingInfo.target === null) {
+        setSelectedNodes({ ids: [], set: {} });
+        return;
+      }
       switch (draggingInfo.target) {
         case "node": {
           commitEdit(draggingInfo.shapeId);
@@ -149,16 +154,16 @@ export const GraphView = () => {
         }
       }
     };
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseup', handleMouseUpOnDocument);
     return () => {
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseup', handleMouseUpOnDocument);
     };
   }, [draggingInfo, commitEdit]);
 
   useEffect(() => {
-    const handleMouseDown = (event: MouseEvent) => {
+    const handleMouseDownOnDocument = (event: MouseEvent) => {
       if (draggingInfo.target !== "field") { return; }
-      // フィールド自体のドラッグを行う
+      // フィールドのドラッグ開始処理
       const cx = event.clientX;
       const cy = event.clientY;
       const x = cx - display.origin.x;
@@ -166,11 +171,12 @@ export const GraphView = () => {
       setDraggingInfo({
         target: "field",
         origin: { x, y },
+        operation: "Move",
       });
     };
-    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousedown', handleMouseDownOnDocument);
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mousedown', handleMouseDownOnDocument);
     }
   }, [display.origin, draggingInfo.target]);
 
@@ -209,9 +215,6 @@ export const GraphView = () => {
       <svg
         className="h-full w-full"
         ref={svgRef}
-        onClick={() => {
-          setSelectedNodes({ ids: [], set: {} });
-        }}
       >
 
         {GridElement}
@@ -236,6 +239,7 @@ export const GraphView = () => {
             }}
 
             mouseDown={(e, draggableMatter) => {
+              // ノードのムーブ開始処理
               switch (draggableMatter.target) {
                 case "node": {
                   if (draggingInfo.target === "node") { return; }
@@ -246,6 +250,7 @@ export const GraphView = () => {
                     ...draggableMatter,
                     origin: { x: e.clientX - node.position.x * scale, y: e.clientY - node.position.y * scale, },
                     size: node.size,
+                    operation: "Move",
                   });
                   break;
                 }
@@ -259,6 +264,7 @@ export const GraphView = () => {
                   setDraggingInfo({
                     ...draggableMatter,
                     origin: { x: e.clientX - s.x * scale, y: e.clientY - s.y * scale, },
+                    operation: "Move",
                   });
                   break;
                 }
@@ -272,6 +278,7 @@ export const GraphView = () => {
             if (draggableMatter.target !== "reshaper") { return; }
             const node = getShape(draggableMatter.shapeId);
             if (isGraphNode(node)) {
+              // ノードのリサイズ(リシェイプ)開始時の処理
               const x = node.position.x;
               const y = node.position.y;
               const w = node.size.width;
@@ -315,8 +322,10 @@ export const GraphView = () => {
               setDraggingInfo({
                 ...draggableMatter,
                 origin,
+                operation: "Reshape",
               });
             } else if (isGraphSegment(node)) {
+              // セグメント端点の移動開始時の処理
               let origin: Vector = { x: 0, y: 0 };
               const rr = getPositionForTerminus(node, graph);
               switch (draggableMatter.resizerType) {
@@ -335,6 +344,7 @@ export const GraphView = () => {
               setDraggingInfo({
                 ...draggableMatter,
                 origin,
+                operation: "Reshape",
               });
             }
           }}

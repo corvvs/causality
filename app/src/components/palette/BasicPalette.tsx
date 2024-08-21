@@ -156,7 +156,12 @@ export const BasicPalette: ComponentWithProps<{
   getCenter: () => Vector;
 }> = (props) => {
 
-  return <div className="basic-palette">
+  return <div
+    className="basic-palette"
+    onMouseUp={(e) => {
+      e.stopPropagation();
+    }}
+  >
     <div className="grid grid-cols-1 grid-flow-row gap-2 p-1 pb-4">
       <div title="Add a Shape">
         <ShapesSubPalette getCenter={props.getCenter} />

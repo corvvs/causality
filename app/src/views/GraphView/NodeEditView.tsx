@@ -22,7 +22,12 @@ export const NodeEditView = (props: {
     });
   };
 
-  return <div className="system-box p-4 gap-4 flex flex-col border-2 text-xs text-left">
+  return <div
+    className="system-box p-4 gap-4 flex flex-col border-2 text-xs text-left"
+    onMouseUp={(e) => {
+      e.stopPropagation();
+    }}
+  >
 
     <div className="p-2 gap-2">
       <label>Text</label>

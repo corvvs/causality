@@ -4,11 +4,15 @@ import { useEffect } from "react";
 export type MyModifierKey = {
   shift: boolean;
   escape: boolean;
+  delete: boolean;
 };
+
+export type MyModifierKeyType = keyof MyModifierKey;
 
 const modifierKeyAtom = atom<MyModifierKey>({
   shift: false,
   escape: false,
+  delete: false,
 });
 
 /**
@@ -38,9 +42,11 @@ export const useModifierKeyObserevr = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log("[handleKeyDown] event.key: ", event.key)
       const attr = keyMap[event.key];
       if (!attr) { return; }
       setModifierKey((prev) => {
+        if (prev[attr]) { return prev; }
         return {
           ...prev,
           [attr]: true,
@@ -49,9 +55,11 @@ export const useModifierKeyObserevr = () => {
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
+      console.log("[handleKeyUp] event.key: ", event.key)
       const attr = keyMap[event.key];
       if (!attr) { return; }
       setModifierKey((prev) => {
+        if (!prev[attr]) { return prev; }
         return {
           ...prev,
           [attr]: false,

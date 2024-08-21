@@ -921,10 +921,10 @@ ellipse {
 }
 
 .linker {
-  stroke: royalblue;
-  fill: var(--foreground);
+  fill: royalblue;
+  stroke: var(--foreground);
   &:hover {
-    fill: var(--ui-hover);
+    fill: var(--foreground);
   }
 }
 

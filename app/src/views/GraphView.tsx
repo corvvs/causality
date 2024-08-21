@@ -14,6 +14,7 @@ import { BasicPalette } from "../components/palette/BasicPalette";
 import { getPositionForTerminus, isFullyFree } from "../libs/segment";
 import { reshapeRectangleLikeNode, reshapeSegment } from "./GraphView/reshaping";
 import { affineApply } from "../libs/affine";
+import { useKeyDown } from "../hooks/keyEvent";
 
 
 
@@ -26,6 +27,7 @@ export const GraphView = () => {
     getActualShape,
     startEdit,
     commitEdit,
+    deleteNode,
     graph,
   } = useGraph();
   const {
@@ -204,6 +206,21 @@ export const GraphView = () => {
       const dy = e.deltaY;
       moveOrigin(display.origin.x - dx, display.origin.y - dy);
     },
+  });
+
+  useKeyDown("Backspace", () => {
+    if (selectedNodes.ids.length !== 1) { return; }
+    const id = selectedNodes.ids[0];
+    deleteNode(id);
+    setSelectedNodes(prev => {
+      if (!prev.set[id]) { return prev; }
+      const set = { ...prev.set };
+      delete set[id];
+      return {
+        ids: prev.ids.filter((v) => v !== id),
+        set,
+      };
+    });
   });
 
   const GridElement = <GridOverlay getViewRect={() => {

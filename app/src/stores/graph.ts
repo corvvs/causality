@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, LineAppearance } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, LineAppearance, ShapeId } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { vectorAdd } from "../libs/vector";
 
@@ -228,6 +228,46 @@ export const useGraph = () => {
     });
   };
 
+  const deleteNode = (shapeId: ShapeId) => {
+    setGraph((prev) => {
+      if (!prev.shapeMap[shapeId]) {
+        console.warn("no entry found");
+        return prev;
+      }
+      const newOrders = prev.orders.filter((id) => id !== shapeId);
+      const newShapeMap = { ...prev.shapeMap };
+      const newTemporaryShapeMap = { ...prev.temporaryShapeMap };
+
+      function remove(tid: ShapeId) {
+        const i = newOrders.findIndex((id) => id === tid);
+        if (i >= 0) {
+          newOrders.splice(i, 1);
+        }
+        delete newShapeMap[tid];
+        delete newTemporaryShapeMap[tid];
+      }
+
+      remove(shapeId);
+      // 削除対象に接続されているセグメントがあったら, それも削除する
+      Object.keys(newShapeMap).forEach((id) => {
+        const shape = newShapeMap[id];
+        if (shape.shapeType !== "Segment") {
+          return;
+        }
+        if (shape.starting === shapeId || shape.ending === shapeId) {
+          remove(shape.id);
+        }
+      });
+
+      return {
+        ...prev,
+        shapeMap: newShapeMap,
+        temporaryShapeMap: newTemporaryShapeMap,
+        orders: newOrders,
+      };
+    });
+  };
+
   /**
    * あるシェイプの編集操作を開始すると、そのシェイプ情報がgraph.shapeMapからgraph.temporaryShapeMapにコピーされる。
    */
@@ -305,6 +345,7 @@ export const useGraph = () => {
     updateNode,
     updateNodeDirectly,
     updateSegment,
+    deleteNode,
     linkUpNodes,
   };
 };

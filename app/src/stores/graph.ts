@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, LineAppearance, ShapeId } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, LineAppearance, ShapeId, isGraphSegment } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { vectorAdd } from "../libs/vector";
 
@@ -250,8 +250,8 @@ export const useGraph = () => {
       remove(shapeId);
       // 削除対象に接続されているセグメントがあったら, それも削除する
       Object.keys(newShapeMap).forEach((id) => {
-        const shape = newShapeMap[id];
-        if (shape.shapeType !== "Segment") {
+        const shape = newShapeMap[id as unknown as ShapeId];
+        if (!isGraphSegment(shape)) {
           return;
         }
         if (shape.starting === shapeId || shape.ending === shapeId) {

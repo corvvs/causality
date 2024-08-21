@@ -45,10 +45,10 @@ function getActualPositionForNominalCircle(r0: Vector, r1: Vector, shape0: Circl
 
 function getActualPositionForNominalRectangle(r0: Vector, r1: Vector, shape0: RectangleNode) {
   const mids: Vector[] = [
-    vectorMid(shape0.position, { x: shape0.position.x + shape0.size.width, y: shape0.position.y }),
-    vectorMid(shape0.position, { x: shape0.position.x, y: shape0.position.y + shape0.size.height }),
-    vectorMid({ x: shape0.position.x + shape0.size.width, y: shape0.position.y }, { x: shape0.position.x + shape0.size.width, y: shape0.position.y + shape0.size.height }),
-    vectorMid({ x: shape0.position.x, y: shape0.position.y + shape0.size.height }, { x: shape0.position.x + shape0.size.width, y: shape0.position.y + shape0.size.height }),
+    vectorMid({ x: r0.x - shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }, { x: r0.x + shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }),
+    vectorMid({ x: r0.x - shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }, { x: r0.x - shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }),
+    vectorMid({ x: r0.x + shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }, { x: r0.x + shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }),
+    vectorMid({ x: r0.x + shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }, { x: r0.x - shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }),
   ];
   return minBy(mids, (mid) => vectorDot(vectorSub(r1, mid), vectorSub(r1, mid)));
 

@@ -1,3 +1,4 @@
+import { wrapForTouchGeneric } from "../../libs/touch";
 import { GraphShape, RectangleLikeNode } from "../../types";
 import { DraggableProps, LinkingProps } from "../../types/components";
 import { Linker, Reshaper, ReshaperCursor } from "../../views/GraphView/types";
@@ -6,7 +7,7 @@ export const ReshapeHandleSide = (props: DraggableProps & {
   shape: GraphShape;
   reshaper: Reshaper;
 }) => {
-  const { reshaper, shape, mouseDownForDragging: mouseDown } = props;
+  const { reshaper, shape, mouseDownForDragging } = props;
   return <rect
     key={reshaper.type}
     className={`reshaper-side stroke-transparent fill-transparent`}
@@ -14,8 +15,15 @@ export const ReshapeHandleSide = (props: DraggableProps & {
     x={reshaper.center.x - reshaper.size.width / 2} y={reshaper.center.y - reshaper.size.height / 2}
     width={reshaper.size.width} height={reshaper.size.height}
     onMouseDown={(e) => {
-      if (!mouseDown) { return; }
-      mouseDown(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape });
+      if (!mouseDownForDragging) { return; }
+      mouseDownForDragging(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape });
+      e.stopPropagation();
+    }}
+    onTouchStart={(e) => {
+      if (!mouseDownForDragging) { return; }
+      wrapForTouchGeneric(
+        (e) => { mouseDownForDragging(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape }); }
+      )(e);
       e.stopPropagation();
     }}
     onClick={(e) => {
@@ -28,7 +36,7 @@ export const ReshaperHandleCorner = (props: DraggableProps & {
   shape: GraphShape;
   reshaper: Reshaper;
 }) => {
-  const { reshaper, shape, mouseDownForDragging: mouseDown } = props;
+  const { reshaper, shape, mouseDownForDragging } = props;
   return <rect
     key={reshaper.type}
     className={`reshaper-corner stroke-1 hover:fill-blue-400`}
@@ -36,8 +44,15 @@ export const ReshaperHandleCorner = (props: DraggableProps & {
     x={reshaper.center.x - reshaper.size.width / 2} y={reshaper.center.y - reshaper.size.height / 2}
     width={reshaper.size.width} height={reshaper.size.height}
     onMouseDown={(e) => {
-      if (!mouseDown) { return; }
-      mouseDown(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape });
+      if (!mouseDownForDragging) { return; }
+      mouseDownForDragging(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape });
+      e.stopPropagation();
+    }}
+    onTouchStart={(e) => {
+      if (!mouseDownForDragging) { return; }
+      wrapForTouchGeneric(
+        (e) => { mouseDownForDragging(e, { target: "reshaper", shapeId: shape.id, resizerType: reshaper.type, shape }); }
+      )(e);
       e.stopPropagation();
     }}
     onClick={(e) => {
@@ -61,6 +76,13 @@ export const LinkHandle = (props: LinkingProps & {
     onMouseDown={(e) => {
       if (!mouseDownForLinking) { return; }
       mouseDownForLinking(e, shape);
+      e.stopPropagation();
+    }}
+    onTouchStart={(e) => {
+      if (!mouseDownForLinking) { return; }
+      wrapForTouchGeneric(
+        (e) => { mouseDownForLinking(e, shape); }
+      )(e);
       e.stopPropagation();
     }}
     onClick={(e) => {

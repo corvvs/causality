@@ -1,5 +1,7 @@
+import { wrapForTouchGeneric } from "../../libs/touch";
 import { RectangleNode } from "../../types";
 import { ComponentWithProps } from "../../types/components";
+import { DraggableMatter } from "../../views/GraphView/types";
 import { SvgNodeInnterText } from "./SvgNodeInnterText";
 import { SvgNodeRectangleLikeSelectedShape } from "./SvgNodeRectangleLikeSelectedShape";
 import { ShapeProps } from "./types";
@@ -7,10 +9,11 @@ import { ShapeProps } from "./types";
 export const SvgNodeRectangleSelectedShape = SvgNodeRectangleLikeSelectedShape;
 
 export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>> = (props) => {
-  const { shape } = props;
+  const { shape, mouseDownForDragging } = props;
 
   const basePosition = shape.position;
   const baseTranslation = `translate(${basePosition.x}px, ${basePosition.y}px)`;
+  const draggableMatter: DraggableMatter = { target: "node", shapeId: shape.id, shape };
   return <g
     style={{
       transform: baseTranslation,
@@ -28,8 +31,13 @@ export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
-        if (!props.mouseDownForDragging) { return; }
-        props.mouseDownForDragging(e, { target: "node", shapeId: shape.id, shape });
+        if (!mouseDownForDragging) { return; }
+        mouseDownForDragging(e, draggableMatter);
+        e.stopPropagation();
+      }}
+      onTouchStart={(e) => {
+        if (!mouseDownForDragging) { return; }
+        wrapForTouchGeneric((e) => mouseDownForDragging(e, draggableMatter))(e);
         e.stopPropagation();
       }}
     />

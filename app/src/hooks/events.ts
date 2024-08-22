@@ -10,17 +10,8 @@ export const useOnPinch = (props: {
     const preventDefault = (e: Event) => {
       e.preventDefault();
     };
-    const preventTouchDefault = (e: TouchEvent) => {
-      if (e.touches.length > 1) {
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('touchstart', preventTouchDefault, { passive: false });
-    document.addEventListener('touchmove', preventTouchDefault, { passive: false });
     document.addEventListener('gesturestart', preventDefault);
     return () => {
-      document.removeEventListener('touchstart', preventTouchDefault);
-      document.removeEventListener('touchmove', preventTouchDefault);
       document.removeEventListener('gesturestart', preventDefault);
     };
   }, []);
@@ -60,4 +51,16 @@ export const useRerenderOnResize = (ref: React.MutableRefObject<Element | null>)
       resizeObserver.disconnect();
     };
   }, [ref, setSize]);
+
+  useEffect(() => {
+    // orientationchange
+    const onOrientationChange = (e: Event) => {
+      const w = e.currentTarget as Window;
+      setSize(w.innerWidth + w.innerHeight);
+    };
+    window.addEventListener('orientationchange', onOrientationChange);
+    return () => {
+      window.removeEventListener('orientationchange', onOrientationChange);
+    };
+  });
 };

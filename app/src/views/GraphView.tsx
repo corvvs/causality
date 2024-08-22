@@ -15,6 +15,8 @@ import { getPositionForTerminus, isFullyFree } from "../libs/segment";
 import { reshapeRectangleLikeNode, reshapeSegment } from "./GraphView/reshaping";
 import { affineApply } from "../libs/affine";
 import { useKeyDown } from "../hooks/keyEvent";
+import { MouseEventLike, wrapForTouch } from "../libs/touch";
+
 
 
 
@@ -68,7 +70,7 @@ export const GraphView = () => {
   };
 
   useEffect(() => {
-    const handleMouseMoveOnDocument = (event: MouseEvent) => {
+    const handleMouseMoveOnDocument = (event: MouseEventLike) => {
       if (!draggingInfo.target) { return; }
       if (!draggingInfo.origin) { return; }
 
@@ -128,11 +130,12 @@ export const GraphView = () => {
         }
       }
     };
-
+    const handleTouchMoveOnDocument = wrapForTouch(handleMouseMoveOnDocument);
     document.addEventListener('mousemove', handleMouseMoveOnDocument);
-
+    document.addEventListener('touchmove', handleTouchMoveOnDocument);
     return () => {
       document.removeEventListener('mousemove', handleMouseMoveOnDocument);
+      document.removeEventListener('touchmove', handleTouchMoveOnDocument);
     };
   }, [draggingInfo, scale, updateNode, updateSegment, getShape, graph, moveOrigin, modifierKey]);
 
@@ -167,14 +170,17 @@ export const GraphView = () => {
         }
       }
     };
+    const handleTouchStartOnDocument = wrapForTouch(handleMouseUpOnDocument);
     document.addEventListener('mouseup', handleMouseUpOnDocument);
+    document.addEventListener('touchend', handleTouchStartOnDocument);
     return () => {
       document.removeEventListener('mouseup', handleMouseUpOnDocument);
+      document.removeEventListener('touchend', handleTouchStartOnDocument);
     };
   }, [draggingInfo, commitEdit]);
 
   useEffect(() => {
-    const handleMouseDownOnDocument = (event: MouseEvent) => {
+    const handleMouseDownOnDocument = (event: MouseEventLike) => {
       if (draggingInfo.target !== "field") { return; }
       // フィールドのドラッグ開始処理
       const cx = event.clientX;
@@ -187,9 +193,12 @@ export const GraphView = () => {
         operation: "Move",
       });
     };
+    const handleTouchEndOnDocument = wrapForTouch(handleMouseDownOnDocument);
     document.addEventListener('mousedown', handleMouseDownOnDocument);
+    document.addEventListener('touchstart', handleTouchEndOnDocument);
     return () => {
       document.removeEventListener('mousedown', handleMouseDownOnDocument);
+      document.removeEventListener('touchstart', handleTouchEndOnDocument);
     }
   }, [display.origin, draggingInfo.target]);
 
@@ -433,13 +442,13 @@ export const GraphView = () => {
     </div>}
 
 
-    <div className="absolute left-0 bottom-0 p-4"
+    {/* <div className="absolute left-0 bottom-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
       <SystemView
         selectedNodes={selectedNodes}
         draggingInfo={draggingInfo}
       />
-    </div>
+    </div> */}
   </div>;
 };

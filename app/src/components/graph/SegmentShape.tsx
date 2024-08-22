@@ -1,9 +1,10 @@
 import { affineApply } from "../../libs/affine";
 import { getPositionForTerminus, isFullyFree } from "../../libs/segment";
+import { wrapForTouchGeneric } from "../../libs/touch";
 import { useDisplay } from "../../stores/display";
 import { CausalGraph, GraphSegment, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
-import { Reshaper } from "../../views/GraphView/types";
+import { DraggableMatter, Reshaper } from "../../views/GraphView/types";
 import { ReshaperHandleCorner } from "./ReshapeHandle";
 import { ShapeProps } from "./types";
 
@@ -55,12 +56,14 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
   const {
     shape,
     graph,
+    mouseDownForDragging,
   } = props;
 
   const centers = getPositionForTerminus(shape, graph);
 
   const lineWidth = shape.shape.line.lineWidth;
   const margin = lineWidth + 20;
+  const draggableMatter: DraggableMatter = { target: "segment", shapeId: shape.id, shape, }
   return <g>
     <line
       x1={centers.starting.x}
@@ -82,11 +85,14 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
-        console.log("mouseDown");
-        if (!props.mouseDownForDragging) { return; }
+        if (!mouseDownForDragging) { return; }
         if (!isFullyFree(shape)) { return; }
-        console.log(shape);
-        props.mouseDownForDragging(e, { target: "segment", shapeId: shape.id, shape, });
+        mouseDownForDragging(e, draggableMatter);
+        e.stopPropagation();
+      }}
+      onTouchStart={(e) => {
+        if (!mouseDownForDragging) { return; }
+        wrapForTouchGeneric((e) => mouseDownForDragging(e, draggableMatter))(e);
         e.stopPropagation();
       }}
     />

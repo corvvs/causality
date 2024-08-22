@@ -783,6 +783,7 @@ video {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  touch-action: none;
   --foreground: #504b55;
   --foreground-secondary: #807d83;
   --foreground-bad: #e22f59;

@@ -4,7 +4,7 @@ import { GraphView } from './views/GraphView'
 function App() {
 
   return (
-    <div className="h-screen w-screen">
+    <div className="h-full w-full">
       <GraphView />
     </div>
   )

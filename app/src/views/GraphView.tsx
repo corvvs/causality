@@ -8,7 +8,7 @@ import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggableMatter, DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { NodeEditView } from "./GraphView/NodeEditView";
-import { SystemView } from "./GraphView/SystemView";
+// import { SystemView } from "./GraphView/SystemView";
 import { useModifierKey } from "../stores/modifier_keys";
 import { BasicPalette } from "../components/palette/BasicPalette";
 import { getPositionForTerminus, isFullyFree } from "../libs/segment";

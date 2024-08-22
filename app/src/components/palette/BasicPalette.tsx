@@ -13,6 +13,7 @@ import { useDisplay } from "../../stores/display"
 import { affineApply } from "../../libs/affine"
 import { useGraph } from "../../stores/graph"
 import { PiLineSegment } from "react-icons/pi"
+import { BsGithub } from "react-icons/bs"
 
 const getIconTypeForColorTheme = (colorTheme: ColorTheme) => {
   switch (colorTheme) {
@@ -148,6 +149,12 @@ export const BasicPalette: ComponentWithProps<{
 
       <div title="Color Theme">
         <ThemeSubPalette getCenter={props.getCenter} />
+      </div>
+
+      <div title="GitHub">
+        <a href="https://github.com/corvvs/causality">
+          <InlineIcon i={<BsGithub className="w-6 h-6" />} />
+        </a>
       </div>
     </div>
   </div>

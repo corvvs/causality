@@ -2,7 +2,7 @@ import { affineApply } from "../../libs/affine";
 import { getPositionForTerminus, isFullyFree } from "../../libs/segment";
 import { wrapForTouchGeneric } from "../../libs/touch";
 import { useDisplay } from "../../stores/display";
-import { CausalGraph, getLineWidth, GraphSegment, TerminusBoundaries, Vector } from "../../types";
+import { CausalGraph, getLineWidth, getSegmentStyle, GraphSegment, TerminusBoundaries, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { DraggableMatter, Reshaper } from "../../views/GraphView/types";
 import { ReshaperHandleCorner } from "./ReshapeHandle";
@@ -86,18 +86,7 @@ const ActualSegment: ComponentWithProps<{
     }
   } : {};
 
-  switch (shape.segmentStyle) {
-    case "zigzag":
-    case "straight": {
-      return <line className="causality"
-        x1={centers.starting.position.x}
-        y1={centers.starting.position.y}
-        x2={centers.ending.position.x}
-        y2={centers.ending.position.y}
-        strokeWidth={strokeWidth}
-        {...additionalProps}
-      />
-    }
+  switch (getSegmentStyle(shape)) {
     case "curve": {
       const sx = centers.starting.position.x;
       const sy = centers.starting.position.y;
@@ -111,6 +100,16 @@ const ActualSegment: ComponentWithProps<{
         d={`M ${sx} ${sy} C ${ax} ${ay} ${bx} ${by} ${ex} ${ey}`}
         strokeWidth={strokeWidth}
         fill="transparent"
+        {...additionalProps}
+      />
+    }
+    default: {
+      return <line className="causality"
+        x1={centers.starting.position.x}
+        y1={centers.starting.position.y}
+        x2={centers.ending.position.x}
+        y2={centers.ending.position.y}
+        strokeWidth={strokeWidth}
         {...additionalProps}
       />
     }

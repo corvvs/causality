@@ -1,4 +1,4 @@
-import { CausalGraph, ColorValue, getLineWidth, GraphNode, GraphSegment, GraphShape, hasLabel, hasLine, isCircleNode, isGraphSegment, isRectangleNode, LineAppearance, Rectangle, SegmentStyles } from "../../types";
+import { CausalGraph, ColorValue, getLineWidth, getSegmentStyle, GraphNode, GraphSegment, GraphShape, hasLabel, hasLine, isCircleNode, isGraphSegment, isRectangleNode, LineAppearance, Rectangle, SegmentStyles } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 import { InlineIcon } from "../InlineIcon";
 import { LiaGripLinesVerticalSolid } from "react-icons/lia";
@@ -158,7 +158,8 @@ const SegmentSubPalette: ComponentWithProps<{
     shape,
   } = props;
 
-  const SegmentStyleIcon = SegmentStyleIconMap[shape.segmentStyle ?? "straight"];
+  const segmentStyle = getSegmentStyle(shape);
+  const SegmentStyleIcon = SegmentStyleIconMap[segmentStyle];
 
   const {
     updateNodeDirectly,

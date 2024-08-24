@@ -7,6 +7,16 @@ export type Vector = {
   y: number;
 };
 
+export type PositionDirection = {
+  position: Vector;
+  direction: Vector;
+};
+
+export type TerminusBoundaries = {
+  starting: PositionDirection;
+  ending: PositionDirection;
+};
+
 export type Rectangle = {
   r0: Vector;
   r1: Vector;
@@ -61,8 +71,11 @@ export type TerminusAppearance = {
 };
 
 // 線分のスタイル; 直線, 折れ線, 曲線
-export const SegmentStyles = ["straight", "zigzag"] as const;
+export const SegmentStyles = ["straight", "zigzag", "curve"] as const;
 export type SegmentStyle = typeof SegmentStyles[number];
+export function getSegmentStyle(shape: GraphSegment) {
+  return shape.segmentStyle ?? SegmentStyles[0];
+}
 
 // 線分の属性
 export type SegmentAppearance = {

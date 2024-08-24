@@ -19,7 +19,7 @@ export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (p
       transform: baseTranslation,
     }}
   >
-    <ellipse
+    <ellipse className="causality"
       cx={shape.size.width / 2} cy={shape.size.height / 2}
       rx={shape.size.width / 2}
       ry={shape.size.height / 2}

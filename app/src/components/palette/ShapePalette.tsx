@@ -13,7 +13,7 @@ import { TiDocumentText } from "react-icons/ti";
 import { MdTurnSharpLeft } from "react-icons/md";
 import { IoIosArrowRoundUp } from "react-icons/io";
 import { MultipleButtons } from "../MultipleButtons";
-
+import { TbArrowCurveLeft } from "react-icons/tb";
 
 
 function getBoundingBoxForShape(shape: GraphShape, graph: CausalGraph, affineFieldToTag: AffineMatrix): Rectangle {
@@ -33,9 +33,15 @@ function getBoundingBoxForShape(shape: GraphShape, graph: CausalGraph, affineFie
   }
   if (isGraphSegment(shape)) {
     const ps = getPositionForTerminus(shape, graph);
-    const r0 = affineApply(affineFieldToTag, ps.starting);
-    const r1 = affineApply(affineFieldToTag, ps.ending);
-    return { r0, r1 };
+    let { x: x0, y: y0 } = affineApply(affineFieldToTag, ps.starting.position);
+    let { x: x1, y: y1 } = affineApply(affineFieldToTag, ps.ending.position);
+    if (x0 > x1) {
+      [x0, x1] = [x1, x0];
+    }
+    if (y0 > y1) {
+      [y0, y1] = [y1, y0];
+    }
+    return { r0: { x: x0, y: y0 }, r1: { x: x1, y: y1 } };
   }
   return { r0: { x: 0, y: 0 }, r1: { x: 0, y: 0 } };
 }
@@ -139,6 +145,7 @@ const LineSubPalette: ComponentWithProps<{
 const SegmentStyleIconMap = {
   "straight": IoIosArrowRoundUp,
   "zigzag": MdTurnSharpLeft,
+  "curve": TbArrowCurveLeft,
 };
 
 /**

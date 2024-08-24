@@ -105,11 +105,15 @@ export const GraphView = () => {
           const r = getPositionForTerminus(n, graph);
           const rs = r.starting;
           const re = r.ending;
-          const dx = xTo - rs.x;
-          const dy = yTo - rs.y;
+          const sx = rs.position.x;
+          const sy = rs.position.y;
+          const ex = re.position.x;
+          const ey = re.position.y;
+          const dx = xTo - sx;
+          const dy = yTo - sy;
           updateSegment(n.id, {
-            starting: { x: rs.x + dx, y: rs.y + dy },
-            ending: { x: re.x + dx, y: re.y + dy },
+            starting: { x: sx + dx, y: sy + dy },
+            ending: { x: ex + dx, y: ey + dy },
           });
           break;
         }
@@ -317,7 +321,7 @@ export const GraphView = () => {
                   startEdit(draggableMatter.shapeId);
                   setDraggingInfo({
                     ...draggableMatter,
-                    origin: { x: e.clientX - s.x * scale, y: e.clientY - s.y * scale, },
+                    origin: { x: e.clientX - s.position.x * scale, y: e.clientY - s.position.y * scale, },
                     operation: "Move",
                   });
                   break;
@@ -386,12 +390,12 @@ export const GraphView = () => {
               switch (draggableMatter.resizerType) {
                 case "Start": {
                   const r = rr.starting;
-                  origin = { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, };
+                  origin = { x: e.clientX - r.position.x * scale, y: e.clientY - r.position.y * scale, };
                   break;
                 }
                 case "End": {
                   const r = rr.ending;
-                  origin = { x: e.clientX - r.x * scale, y: e.clientY - r.y * scale, };
+                  origin = { x: e.clientX - r.position.x * scale, y: e.clientY - r.position.y * scale, };
                   break;
                 }
               }

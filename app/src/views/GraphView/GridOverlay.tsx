@@ -56,7 +56,7 @@ const GridSubLayer: ComponentWithProps<{
     const n = nXGridMin + i;
     const vf: Vector = { x: n * gridDistance, y: 0 };
     const vt = affineApply(affineFieldToTag, vf);
-    grids.push(<line
+    grids.push(<line className="causality"
       key={`x_${i}`}
       x1={vt.x} y1={viewR0Tag.y}
       x2={vt.x} y2={viewR1Tag.y}
@@ -67,7 +67,7 @@ const GridSubLayer: ComponentWithProps<{
     const n = nYGridMin + i;
     const vf: Vector = { x: 0, y: n * gridDistance };
     const vt = affineApply(affineFieldToTag, vf);
-    grids.push(<line
+    grids.push(<line className="causality"
       key={`y_${i}`}
       x1={viewR0Tag.x} y1={vt.y}
       x2={viewR1Tag.x} y2={vt.y}

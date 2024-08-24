@@ -1,6 +1,6 @@
 import { minBy } from "es-toolkit";
 import { getShapeForGraph } from "../stores/graph";
-import { CausalGraph, CircleNode, GraphSegment, GraphShape, isBondedToShape, isCircleNode, isGraphNode, isRectangleNode, RectangleNode, SegmentBond, Vector } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphShape, isBondedToShape, isCircleNode, isGraphNode, isRectangleNode, PositionDirection, RectangleNode, SegmentBond, TerminusBoundaries, Vector } from "../types";
 import { getNodeCenter } from "./shape";
 import { vectorDot, vectorMid, vectorSub } from "./vector";
 
@@ -14,20 +14,29 @@ function getPositionForBond(bond: SegmentBond, graph: CausalGraph): Vector {
   }
 }
 
-function getActualPositionForNominalCircle(r0: Vector, r1: Vector, shape0: CircleNode): Vector {
+function getActualPositionForNominalCircle(r0: Vector, r1: Vector, shape0: CircleNode): PositionDirection {
 
   let maxD: number = Infinity;
-  let answer: Vector = r0;
+  let answer: PositionDirection = {
+    position: r0,
+    direction: vectorSub(r1, r0),
+  };
   
-  for (let i = 0; i < 4; i++) {
+  const w = shape0.size.width / 2;
+  const h = shape0.size.height / 2;
+for (let i = 0; i < 4; i++) {
     const phi = Math.PI / 2 * i;
-    const x = shape0.position.x + shape0.size.width / 2 + shape0.size.width / 2 * Math.cos(phi);
-    const y = shape0.position.y + shape0.size.height / 2 + shape0.size.height / 2 * Math.sin(phi);
+    const d = { x: w * Math.cos(phi), y: h * Math.sin(phi) };
+    const x = shape0.position.x + w / 2 + d.x;
+    const y = shape0.position.y + h / 2 + d.y;
     const v = vectorSub(r1, { x, y });
-    const d = vectorDot(v, v);
-    if (d < maxD) {
-      maxD = d;
-      answer = { x, y };
+    const vv = vectorDot(v, v);
+    if (vv < maxD) {
+      maxD = vv;
+      answer = {
+        position: { x, y },
+        direction: d,
+      };
     }
   }
   return answer;
@@ -43,14 +52,31 @@ function getActualPositionForNominalCircle(r0: Vector, r1: Vector, shape0: Circl
   // };
 }
 
-function getActualPositionForNominalRectangle(r0: Vector, r1: Vector, shape0: RectangleNode) {
-  const mids: Vector[] = [
-    vectorMid({ x: r0.x - shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }, { x: r0.x + shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }),
-    vectorMid({ x: r0.x - shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }, { x: r0.x - shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }),
-    vectorMid({ x: r0.x + shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }, { x: r0.x + shape0.size.width / 2, y: r0.y - shape0.size.height / 2 }),
-    vectorMid({ x: r0.x + shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }, { x: r0.x - shape0.size.width / 2, y: r0.y + shape0.size.height / 2 }),
+function getActualPositionForNominalRectangle(r0: Vector, r1: Vector, shape0: RectangleNode): PositionDirection {
+  const w = shape0.size.width / 2;
+  const h = shape0.size.height / 2;
+  const mids: PositionDirection[] = [
+    {
+      // N
+      position: vectorMid({ x: r0.x - w, y: r0.y - h }, { x: r0.x + w, y: r0.y - h }),
+      direction: { x: 0, y: -h },
+    },
+    {
+      // W
+      position: vectorMid({ x: r0.x - w, y: r0.y - h }, { x: r0.x - w, y: r0.y + h }),
+      direction: { x: -w, y: 0 },
+    },
+    { // E
+      position: vectorMid({ x: r0.x + w, y: r0.y + h }, { x: r0.x + w, y: r0.y - h }),
+      direction: { x: +w, y: -1 },
+    },
+    {
+      // S
+      position: vectorMid({ x: r0.x + w, y: r0.y + h }, { x: r0.x - w, y: r0.y + h }),
+      direction: { x: 0, y: +h },
+    },
   ];
-  return minBy(mids, (mid) => vectorDot(vectorSub(r1, mid), vectorSub(r1, mid)));
+  return minBy(mids, (mid) => vectorDot(vectorSub(r1, mid.position), vectorSub(r1, mid.position)));
 
   // const corners: Vector[] = [
   //   { x: shape0.position.x, y: shape0.position.y }, // top-left
@@ -92,21 +118,30 @@ function getActualPositionForNominal(r0: Vector, r1: Vector, shape0: GraphShape)
   if (isRectangleNode(shape0)) {
     return getActualPositionForNominalRectangle(r0, r1, shape0);
   }
-  return r0;
+  return {
+    position: r0,
+    direction: vectorSub(r1, r0),
+  };
 }
 
-export function getPositionForTerminus(segment: GraphSegment, graph: CausalGraph) {
+export function getPositionForTerminus(segment: GraphSegment, graph: CausalGraph): TerminusBoundaries {
   const nominal = {
     starting: getPositionForBond(segment.starting, graph),
     ending: getPositionForBond(segment.ending, graph),
   };
 
-  const actualStarting = isBondedToShape(segment.starting)
+  const actualStarting: PositionDirection = isBondedToShape(segment.starting)
     ? getActualPositionForNominal(nominal.starting, nominal.ending, getShapeForGraph(segment.starting, graph))
-    : nominal.starting;
-  const actualEnding = isBondedToShape(segment.ending)
+    : {
+      position: nominal.starting,
+      direction: vectorSub(nominal.ending, nominal.starting),
+    };
+  const actualEnding: PositionDirection = isBondedToShape(segment.ending)
     ? getActualPositionForNominal(nominal.ending, nominal.starting, getShapeForGraph(segment.ending, graph))
-    : nominal.ending;
+    : {
+      position: nominal.ending,
+      direction: vectorSub(nominal.starting, nominal.ending),
+    };
   return {
     starting: actualStarting,
     ending: actualEnding,

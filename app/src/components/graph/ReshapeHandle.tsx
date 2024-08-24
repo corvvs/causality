@@ -10,7 +10,7 @@ export const ReshapeHandleSide = (props: DraggableProps & {
   const { reshaper, shape, mouseDownForDragging } = props;
   return <rect
     key={reshaper.type}
-    className={`reshaper-side stroke-transparent fill-transparent`}
+    className={`causality reshaper-side stroke-transparent fill-transparent`}
     style={{ cursor: ReshaperCursor[reshaper.type] }}
     x={reshaper.center.x - reshaper.size.width / 2} y={reshaper.center.y - reshaper.size.height / 2}
     width={reshaper.size.width} height={reshaper.size.height}
@@ -39,7 +39,7 @@ export const ReshaperHandleCorner = (props: DraggableProps & {
   const { reshaper, shape, mouseDownForDragging } = props;
   return <rect
     key={reshaper.type}
-    className={`reshaper-corner stroke-1 hover:fill-blue-400`}
+    className={`causality reshaper-corner stroke-1 hover:fill-blue-400`}
     style={{ cursor: ReshaperCursor[reshaper.type] }}
     x={reshaper.center.x - reshaper.size.width / 2} y={reshaper.center.y - reshaper.size.height / 2}
     width={reshaper.size.width} height={reshaper.size.height}
@@ -70,7 +70,7 @@ export const LinkHandle = (props: LinkingProps & {
 
   return <circle
     key={linker.type}
-    className={`linker stroke-1`}
+    className={`causality linker stroke-1`}
     cx={linker.center.x} cy={linker.center.y}
     r={linker.radius}
     onMouseDown={(e) => {

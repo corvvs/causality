@@ -87,7 +87,7 @@ export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<
 
   return <>
     <rect
-      className="node-selection-box pointer-events-none"
+      className="causality node-selection-box pointer-events-none"
       x={rNorthWest.x - boxMargin} y={rNorthWest.y - boxMargin}
       width={rSouthEast.x - rNorthWest.x + boxMargin * 2}
       height={rSouthEast.y - rNorthWest.y + boxMargin * 2}

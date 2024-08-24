@@ -2,8 +2,8 @@ import { GraphShape, RectangleLikeNode } from ".";
 import { MouseEventLike } from "../libs/touch";
 import { DraggableMatter } from "../views/GraphView/types";
 
-type HTMLProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-export type ComponentWithProps<T extends object> = React.FC<T & HTMLProps>;
+type HTMLProps<S extends Element> = React.DetailedHTMLProps<React.HTMLAttributes<S>, S>;
+export type ComponentWithProps<T extends object, S extends Element = HTMLElement> = React.FC<T & HTMLProps<S>>;
 export type DraggableProps = {
   mouseDownForDragging?: (e: MouseEventLike, matter: DraggableMatter) => void;
 };

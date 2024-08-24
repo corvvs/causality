@@ -19,7 +19,7 @@ export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>
       transform: baseTranslation,
     }}
   >
-    <rect
+    <rect className="causality"
       x="0" y="0"
       width={shape.size.width}
       height={shape.size.height}

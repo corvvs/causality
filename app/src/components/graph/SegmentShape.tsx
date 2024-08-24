@@ -2,7 +2,7 @@ import { affineApply } from "../../libs/affine";
 import { getPositionForTerminus, isFullyFree } from "../../libs/segment";
 import { wrapForTouchGeneric } from "../../libs/touch";
 import { useDisplay } from "../../stores/display";
-import { CausalGraph, getLineWidth, GraphSegment, Vector } from "../../types";
+import { CausalGraph, getLineWidth, GraphSegment, TerminusBoundaries, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { DraggableMatter, Reshaper } from "../../views/GraphView/types";
 import { ReshaperHandleCorner } from "./ReshapeHandle";
@@ -36,11 +36,11 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
   } = useDisplay();
 
   const centers = getPositionForTerminus(shape, graph);
-  const rStart = affineApply(affineFieldToTag, centers.starting);
-  const rEnd = affineApply(affineFieldToTag, centers.ending);
+  const rStart = affineApply(affineFieldToTag, centers.starting.position);
+  const rEnd = affineApply(affineFieldToTag, centers.ending.position);
   return <>
     <line
-      className="segment-selection-box pointer-events-none"
+      className="causality segment-selection-box pointer-events-none"
       x1={rStart.x}
       y1={rStart.y}
       x2={rEnd.x}
@@ -52,11 +52,75 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
   </>;
 };
 
+const ActualSegment: ComponentWithProps<{
+  draggableMatter?: DraggableMatter;
+  centers: TerminusBoundaries;
+  strokeWidth: number;
+} & ShapeProps<GraphSegment>> = (props) => {
+  const {
+    draggableMatter,
+    centers,
+    shape,
+    clickForSelection,
+    mouseDownForDragging,
+    strokeWidth,
+  } = props;
+
+  const additionalProps = draggableMatter ? {
+    className: "hit-target",
+    onClick: (e: React.MouseEvent<SVGLineElement>) => {
+      if (!clickForSelection) { return; }
+      clickForSelection(e, shape);
+      e.stopPropagation();
+    },
+    onMouseDown: (e: React.MouseEvent<SVGLineElement>) => {
+      if (!mouseDownForDragging) { return; }
+      if (!isFullyFree(shape)) { return; }
+      mouseDownForDragging(e, draggableMatter);
+      e.stopPropagation();
+    },
+    onTouchStart: (e: React.TouchEvent<SVGLineElement>) => {
+      if (!mouseDownForDragging) { return; }
+      wrapForTouchGeneric((e) => mouseDownForDragging(e, draggableMatter))(e);
+      e.stopPropagation();
+    }
+  } : {};
+
+  switch (shape.segmentStyle) {
+    case "zigzag":
+    case "straight": {
+      return <line className="causality"
+        x1={centers.starting.position.x}
+        y1={centers.starting.position.y}
+        x2={centers.ending.position.x}
+        y2={centers.ending.position.y}
+        strokeWidth={strokeWidth}
+        {...additionalProps}
+      />
+    }
+    case "curve": {
+      const sx = centers.starting.position.x;
+      const sy = centers.starting.position.y;
+      const ax = centers.starting.position.x + centers.starting.direction.x;
+      const ay = centers.starting.position.y + centers.starting.direction.y;
+      const bx = centers.ending.position.x + centers.ending.direction.x;
+      const by = centers.ending.position.y + centers.ending.direction.y;
+      const ex = centers.ending.position.x;
+      const ey = centers.ending.position.y;
+      return <path className="causality"
+        d={`M ${sx} ${sy} C ${ax} ${ay} ${bx} ${by} ${ex} ${ey}`}
+        strokeWidth={strokeWidth}
+        fill="transparent"
+        {...additionalProps}
+      />
+    }
+  }
+};
+
 export const SegmentShapeElement: ComponentWithProps<ShapeProps<GraphSegment>> = (props) => {
   const {
     shape,
     graph,
-    mouseDownForDragging,
   } = props;
 
   const centers = getPositionForTerminus(shape, graph);
@@ -65,36 +129,8 @@ export const SegmentShapeElement: ComponentWithProps<ShapeProps<GraphSegment>> =
   const margin = lineWidth + 20;
   const draggableMatter: DraggableMatter = { target: "segment", shapeId: shape.id, shape, }
   return <g>
-    <line
-      x1={centers.starting.x}
-      y1={centers.starting.y}
-      x2={centers.ending.x}
-      y2={centers.ending.y}
-      strokeWidth={lineWidth}
-    />
-    <line
-      className="hit-target"
-      x1={centers.starting.x}
-      y1={centers.starting.y}
-      x2={centers.ending.x}
-      y2={centers.ending.y}
-      strokeWidth={margin}
-      onClick={(e) => {
-        if (!props.clickForSelection) { return; }
-        props.clickForSelection(e, shape);
-        e.stopPropagation();
-      }}
-      onMouseDown={(e) => {
-        if (!mouseDownForDragging) { return; }
-        if (!isFullyFree(shape)) { return; }
-        mouseDownForDragging(e, draggableMatter);
-        e.stopPropagation();
-      }}
-      onTouchStart={(e) => {
-        if (!mouseDownForDragging) { return; }
-        wrapForTouchGeneric((e) => mouseDownForDragging(e, draggableMatter))(e);
-        e.stopPropagation();
-      }}
+    <ActualSegment {...props} centers={centers} strokeWidth={lineWidth} />
+    <ActualSegment {...props} centers={centers} strokeWidth={margin} draggableMatter={draggableMatter}
     />
   </g>;
 };

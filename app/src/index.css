@@ -128,20 +128,6 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 } */
 
-line {
-  stroke: var(--foreground);
-
-  &.hit-target {
-    stroke: transparent;
-    fill: transparent;
-  }
-}
-
-rect,
-ellipse {
-  stroke: var(--foreground);
-}
-
 .ce-button {
   padding: 0.25rem 1rem;
 
@@ -151,24 +137,54 @@ ellipse {
   }
 }
 
-.node-selection-box {
-  stroke: royalblue;
-}
-
-.segment-selection-box {
-  stroke: royalblue;
-}
-
-.reshaper-corner {
-  fill: var(--background);
-}
-
-.linker {
-  fill: royalblue;
+line.causality,
+path.causality {
   stroke: var(--foreground);
 
-  &:hover {
-    fill: var(--foreground);
+  &.hit-target {
+    stroke: transparent;
+    fill: transparent;
+  }
+}
+
+rect.causality,
+ellipse.causality {
+  stroke: var(--foreground);
+}
+
+line.causality,
+path.causality,
+rect.causality,
+circle.causality,
+ellipse.causality {
+
+  &.node-selection-box {
+    stroke: royalblue;
+  }
+
+  &.segment-selection-box {
+    stroke: royalblue;
+  }
+
+  &.reshaper-corner {
+    fill: var(--background);
+
+    &:hover {
+      fill: royalblue;
+    }
+  }
+
+  &.reshaper-side {
+    stroke: transparent;
+  }
+
+  &.linker {
+    fill: royalblue;
+    stroke: var(--foreground);
+
+    &:hover {
+      fill: var(--foreground);
+    }
   }
 }
 

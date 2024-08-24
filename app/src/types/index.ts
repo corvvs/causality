@@ -171,3 +171,6 @@ export type CausalDisplay = {
   origin: Vector;
   magnitude: number;
 };
+export type CausalDisplayVersioned = CausalDisplay & {
+  version: string;
+};

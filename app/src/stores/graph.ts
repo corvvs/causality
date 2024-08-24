@@ -7,8 +7,15 @@ import { useState } from "react";
 const graphKey = "GRAPH";
 const graphProvider = localStorageProvider<CausalGraphVersioned>(graphKey);
 
-const currentGraphVersion = "0.0.1";
-const graphAtom = atom<CausalGraphVersioned>(graphProvider.load() ?? {
+const currentGraphVersion = "0.0.2";
+function loadGraph() {
+  const g = graphProvider.load();
+  if (g && g.version === currentGraphVersion) {
+    return g;
+  }
+  return null;
+}
+const graphAtom = atom<CausalGraphVersioned>(loadGraph() ?? {
   version: currentGraphVersion,
   index: 0,
   shapeMap: {},

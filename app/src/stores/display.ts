@@ -1,14 +1,22 @@
 import { atom, useAtom } from "jotai";
-import { CausalDisplay, Vector } from "../types";
+import { CausalDisplay, CausalDisplayVersioned, Vector } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { affineCompose, affineInvert, affineScale, affineTranslation } from "../libs/affine";
 import { useCallback, useMemo } from "react";
 
 const displayKey = "DISPLAY";
-const displayProvider = localStorageProvider<CausalDisplay>(displayKey);
+const displayProvider = localStorageProvider<CausalDisplayVersioned>(displayKey);
 
-
-const displayAtom = atom<CausalDisplay>(displayProvider.load() ?? {
+const currentDisplayVersion = "0.0.2";
+function loadDisplay() {
+  const d = displayProvider.load();
+  if (d && d.version === currentDisplayVersion) {
+    return d;
+  }
+  return null;
+}
+const displayAtom = atom<CausalDisplayVersioned>(loadDisplay() ?? {
+  version: currentDisplayVersion,
   origin: { x: 0, y: 0 },
   magnitude: 0,
 });
@@ -65,7 +73,7 @@ export const useDisplay = () => {
   };
 
   return {
-    display,
+    display: display as CausalDisplay,
     scale,
     transformFieldToBrowser: `translate(${display.origin.x}px, ${display.origin.y}px) scale(${scale})`,
     affineFieldToTag,

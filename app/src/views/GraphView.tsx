@@ -41,8 +41,10 @@ export const GraphView = () => {
     changeScale,
     transformFieldToBrowser,
     affineTagToField,
+    saveDisplay,
   } = useDisplay();
   const saveGraphRef = useRef(saveGraph);
+  const saveDisplayRef = useRef(saveDisplay);
 
   const {
     modifierKey,
@@ -252,11 +254,14 @@ export const GraphView = () => {
 
   const isSelectedSome = Object.keys(selectedNodes.ids).length === 1;
 
+  // NOTE: グラフ状態の保存処理
   useEffect(() => {
     saveGraphRef.current = saveGraph;
-  }, [saveGraph]);
+    saveDisplayRef.current = saveDisplay;
+  }, [saveGraph, saveDisplay]);
   useEffect(() => {
     saveGraphRef.current();
+    saveDisplayRef.current();
   }, [commitCount]);
 
   return <div className="h-screen w-screen flex flex-col" style={style}>

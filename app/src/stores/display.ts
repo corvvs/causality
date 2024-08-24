@@ -58,6 +58,12 @@ export const useDisplay = () => {
   const affineDataToTag = useMemo(() => affineTranslation(display.origin), [display.origin]);
   const affineFieldToTag = useMemo(() => affineCompose(affineDataToTag, affineFieldToData), [affineDataToTag, affineFieldToData]);
   const affineTagToField = useMemo(() => affineInvert(affineFieldToTag), [affineFieldToTag]);
+
+  const saveDisplay = () => {
+    displayProvider.save(display);
+    console.log("[display] saved.")
+  };
+
   return {
     display,
     scale,
@@ -68,5 +74,6 @@ export const useDisplay = () => {
     changeScale,
     scaleMin,
     scaleMax,
+    saveDisplay,
   };
 };

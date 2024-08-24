@@ -308,7 +308,7 @@ export function useGraph() {
       };
     });
     setCommitCount((prev) => prev + 1);
-    console.log("committed.");
+    console.log("[graph] committed.");
   };
 
   /**
@@ -332,7 +332,7 @@ export function useGraph() {
 
   const saveGraph = () => {
     graphProvider.save(graph);
-    console.log("saved.")
+    console.log("[graph] saved.")
   };
 
 

@@ -31,6 +31,8 @@ export const GraphView = () => {
     commitEdit,
     deleteNode,
     graph,
+    commitCount,
+    saveGraph,
   } = useGraph();
   const {
     display,
@@ -40,6 +42,7 @@ export const GraphView = () => {
     transformFieldToBrowser,
     affineTagToField,
   } = useDisplay();
+  const saveGraphRef = useRef(saveGraph);
 
   const {
     modifierKey,
@@ -179,28 +182,28 @@ export const GraphView = () => {
     };
   }, [draggingInfo, commitEdit]);
 
-  useEffect(() => {
-    const handleMouseDownOnDocument = (event: MouseEventLike) => {
-      if (draggingInfo.target !== "field") { return; }
-      // フィールドのドラッグ開始処理
-      const cx = event.clientX;
-      const cy = event.clientY;
-      const x = cx - display.origin.x;
-      const y = cy - display.origin.y;
-      setDraggingInfo({
-        target: "field",
-        origin: { x, y },
-        operation: "Move",
-      });
-    };
-    const handleTouchEndOnDocument = wrapForTouch(handleMouseDownOnDocument);
-    document.addEventListener('mousedown', handleMouseDownOnDocument);
-    document.addEventListener('touchstart', handleTouchEndOnDocument);
-    return () => {
-      document.removeEventListener('mousedown', handleMouseDownOnDocument);
-      document.removeEventListener('touchstart', handleTouchEndOnDocument);
-    }
-  }, [display.origin, draggingInfo.target]);
+  // useEffect(() => {
+  //   const handleMouseDownOnDocument = (event: MouseEventLike) => {
+  //     if (draggingInfo.target !== "field") { return; }
+  //     // フィールドのドラッグ開始処理
+  //     const cx = event.clientX;
+  //     const cy = event.clientY;
+  //     const x = cx - display.origin.x;
+  //     const y = cy - display.origin.y;
+  //     setDraggingInfo({
+  //       target: "field",
+  //       origin: { x, y },
+  //       operation: "Move",
+  //     });
+  //   };
+  //   const handleTouchEndOnDocument = wrapForTouch(handleMouseDownOnDocument);
+  //   document.addEventListener('mousedown', handleMouseDownOnDocument);
+  //   document.addEventListener('touchstart', handleTouchEndOnDocument);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleMouseDownOnDocument);
+  //     document.removeEventListener('touchstart', handleTouchEndOnDocument);
+  //   }
+  // }, [display.origin, draggingInfo.target]);
 
   useOnPinch({
     onPinchZoom: (e) => {
@@ -248,6 +251,13 @@ export const GraphView = () => {
   }} />
 
   const isSelectedSome = Object.keys(selectedNodes.ids).length === 1;
+
+  useEffect(() => {
+    saveGraphRef.current = saveGraph;
+  }, [saveGraph]);
+  useEffect(() => {
+    saveGraphRef.current();
+  }, [commitCount]);
 
   return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">

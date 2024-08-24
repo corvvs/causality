@@ -5,10 +5,10 @@ import { affineCompose, affineInvert, affineScale, affineTranslation } from "../
 import { useCallback, useMemo } from "react";
 
 const displayKey = "DISPLAY";
-const displayProvider = localStorageProvider<CausalDisplay>();
+const displayProvider = localStorageProvider<CausalDisplay>(displayKey);
 
 
-const displayAtom = atom<CausalDisplay>(displayProvider.load(displayKey) ?? {
+const displayAtom = atom<CausalDisplay>(displayProvider.load() ?? {
   origin: { x: 0, y: 0 },
   magnitude: 0,
 });

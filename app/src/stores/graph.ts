@@ -1,12 +1,15 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, ShapeId, isGraphSegment } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, ShapeId, isGraphSegment, CausalGraphVersioned } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { vectorAdd } from "../libs/vector";
+import { useState } from "react";
 
 const graphKey = "GRAPH";
-const graphProvider = localStorageProvider<CausalGraph>();
+const graphProvider = localStorageProvider<CausalGraphVersioned>(graphKey);
 
-const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
+const currentGraphVersion = "0.0.1";
+const graphAtom = atom<CausalGraphVersioned>(graphProvider.load() ?? {
+  version: currentGraphVersion,
   index: 0,
   shapeMap: {},
   temporaryShapeMap: {},
@@ -66,8 +69,9 @@ export function getActualShapeForGraph(id: number, graph: CausalGraph) {
   return graph.shapeMap[id];
 }
 
-export const useGraph = () => {
+export function useGraph() {
   const [graph, setGraph] = useAtom(graphAtom);
+  const [commitCount, setCommitCount] = useState(0);
 
   const getShape = (id: number) => getShapeForGraph(id, graph);
   const getActualShape = (id: number) => getActualShapeForGraph(id, graph);
@@ -82,6 +86,7 @@ export const useGraph = () => {
     const nn = newRectNode(newIndex, position);
     setGraph((prev) => {
       return {
+        ...prev,
         index: newIndex,
         shapeMap: {
           ...prev.shapeMap,
@@ -99,6 +104,7 @@ export const useGraph = () => {
     const nn = newCircleNode(newIndex, position);
     setGraph((prev) => {
       return {
+        ...prev,
         index: newIndex,
         shapeMap: {
           ...prev.shapeMap,
@@ -120,6 +126,7 @@ export const useGraph = () => {
     console.log("addSegment", nn);
     setGraph((prev) => {
       return {
+        ...prev,
         index: newIndex,
         shapeMap: {
           ...prev.shapeMap,
@@ -155,6 +162,7 @@ export const useGraph = () => {
     };
     setGraph((prev) => {
       return {
+        ...prev,
         index: newIndex,
         shapeMap: { ...prev.shapeMap, [edge.id]: edge },
         temporaryShapeMap: { ...prev.temporaryShapeMap },
@@ -299,6 +307,8 @@ export const useGraph = () => {
         temporaryShapeMap: newTemporary,
       };
     });
+    setCommitCount((prev) => prev + 1);
+    console.log("committed.");
   };
 
   /**
@@ -320,9 +330,15 @@ export const useGraph = () => {
     });
   };
 
+  const saveGraph = () => {
+    graphProvider.save(graph);
+    console.log("saved.")
+  };
+
 
   return {
-    graph,
+    graph: graph as CausalGraph,
+    saveGraph,
     getShape,
     getActualShape,
     startEdit,
@@ -337,7 +353,8 @@ export const useGraph = () => {
     updateSegment,
     deleteNode,
     linkUpNodes,
+    commitCount,
   };
-};
+}
 
 export type GraphUsed = ReturnType<typeof useGraph>;

@@ -163,6 +163,10 @@ export type CausalGraph = {
   orders: ShapeId[];
 }
 
+export type CausalGraphVersioned = CausalGraph & {
+  version: string;
+};
+
 export type CausalDisplay = {
   origin: Vector;
   magnitude: number;

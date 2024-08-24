@@ -41,7 +41,7 @@ const ShapesSubPalette: ComponentWithProps<{
 
   return <Popover className="relative">
     <PopoverButton as="div">
-      <Button className="basic-palette-button p-1">
+      <Button className="canvas-palette-button p-1">
         <InlineIcon i={<TbSquares className="w-6 h-6" />} />
       </Button>
     </PopoverButton>
@@ -98,7 +98,7 @@ const ScaleSubPalette: ComponentWithProps<{
 }> = (props) => {
   return <Popover className="relative">
     <PopoverButton as="div">
-      <Button className="basic-palette-button p-1">
+      <Button className="canvas-palette-button p-1">
         <InlineIcon i={<SlMagnifier className="w-6 h-6" />} />
       </Button>
     </PopoverButton>
@@ -117,7 +117,7 @@ const ThemeSubPalette: ComponentWithProps<{
   const IconTypeForColorTheme = getIconTypeForColorTheme(appColorTheme);
   return <Popover className="relative">
     <PopoverButton as="div">
-      <Button className="basic-palette-button p-1">
+      <Button className="canvas-palette-button p-1">
         <InlineIcon i={<IconTypeForColorTheme className="w-6 h-6" />} />
       </Button>
     </PopoverButton>
@@ -128,12 +128,12 @@ const ThemeSubPalette: ComponentWithProps<{
 
 }
 
-export const BasicPalette: ComponentWithProps<{
+export const CanvasPalette: ComponentWithProps<{
   getCenter: () => Vector;
 }> = (props) => {
 
   return <div
-    className="basic-palette"
+    className="canvas-palette"
     onMouseUp={(e) => {
       e.stopPropagation();
     }}
@@ -158,5 +158,4 @@ export const BasicPalette: ComponentWithProps<{
       </div>
     </div>
   </div>
-
 }

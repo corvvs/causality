@@ -1,5 +1,5 @@
 import { wrapForTouchGeneric } from "../../libs/touch";
-import { RectangleNode } from "../../types";
+import { getLineWidth, RectangleNode } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 import { DraggableMatter } from "../../views/GraphView/types";
 import { SvgNodeInnterText } from "./SvgNodeInnterText";
@@ -24,7 +24,7 @@ export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>
       width={shape.size.width}
       height={shape.size.height}
       fill="transparent"
-      strokeWidth={shape.shape.line.lineWidth}
+      strokeWidth={getLineWidth(shape.shape)}
       onClick={(e) => {
         if (!props.clickForSelection) { return; }
         props.clickForSelection(e, shape);

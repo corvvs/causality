@@ -1,5 +1,5 @@
 import { wrapForTouchGeneric } from "../../libs/touch";
-import { CircleNode } from "../../types";
+import { CircleNode, getLineWidth } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 import { DraggableMatter } from "../../views/GraphView/types";
 import { SvgNodeInnterText } from "./SvgNodeInnterText";
@@ -24,7 +24,7 @@ export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (p
       rx={shape.size.width / 2}
       ry={shape.size.height / 2}
       fill="transparent"
-      strokeWidth={shape.shape.line.lineWidth}
+      strokeWidth={getLineWidth(shape.shape)}
       onClick={(e) => {
         if (!props.clickForSelection) { return; }
         props.clickForSelection(e, shape);

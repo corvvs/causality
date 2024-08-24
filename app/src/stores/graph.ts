@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, LineAppearance, ShapeId, isGraphSegment } from "../types";
+import { CausalGraph, CircleNode, GraphSegment, GraphNode, RectangleNode, Vector, ShapeId, isGraphSegment } from "../types";
 import { localStorageProvider } from "../infra/localStorage";
 import { vectorAdd } from "../libs/vector";
 
@@ -13,12 +13,6 @@ const graphAtom = atom<CausalGraph>(graphProvider.load(graphKey) ?? {
   orders: [],
 });
 
-function getDefaultLineAppearance(): LineAppearance {
-  return {
-    lineWidth: 2,
-  }
-}
-
 function newRectNode(index: number, position: Vector): RectangleNode {
   return {
     id: index,
@@ -31,7 +25,6 @@ function newRectNode(index: number, position: Vector): RectangleNode {
       height: 100,
     },
     shape: {
-      line: getDefaultLineAppearance(),
     },
   }
 }
@@ -48,7 +41,6 @@ function newCircleNode(index: number, position: Vector): CircleNode {
       height: 100,
     },
     shape: {
-      line: getDefaultLineAppearance(),
     },
   }
 }
@@ -61,7 +53,6 @@ function newSegment(index: number, position: Vector): GraphSegment {
     starting: vectorAdd(position, { x: +100, y: -50 }),
     ending: vectorAdd(position, { x: -100, y: +50 }),
     shape: {
-      line: getDefaultLineAppearance(),
     },
     z: index,
   };
@@ -159,7 +150,6 @@ export const useGraph = () => {
       starting,
       ending,
       shape: {
-        line: getDefaultLineAppearance(),
       },
       z: newIndex,
     };

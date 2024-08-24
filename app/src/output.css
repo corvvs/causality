@@ -857,7 +857,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   color: var(--foreground);
-  background-color: var(--background);
+  background-color: var(--background-secondary);
   transition: color var(--theme-transition);
   transition: background-color var(--theme-transition);
 }
@@ -940,15 +940,16 @@ ellipse {
   background-color: var(--background-secondary);
 }
 
-.basic-palette {
+.canvas-palette {
   position: absolute;
   left: 1rem;
   top: 20%;
   border-color: none;
-  color: var(--background);
-  background-color: var(--foreground);
+  color: var(--foreground);
+  background-color: var(--background);
   border-radius: 0.25rem;
-  .basic-palette-button {
+  box-shadow: 0px 0px 8px var(--foreground-secondary);
+  .canvas-palette-button {
     border-radius: 0.25rem;
     &:hover {
       background-color: var(--foreground-secondary);
@@ -956,14 +957,30 @@ ellipse {
   }
 }
 
-.basic-palette-subpanel {
-  color: var(--background);
-  background-color: var(--foreground);
+.canvas-palette-subpanel {
+  color: var(--foreground);
+  background-color: var(--background);
   border-radius: 0.25rem;
+  box-shadow: 0px 0px 8px var(--foreground-secondary);
   button {
     &:hover {
       color: var(--foreground);
       background-color: var(--background);
+    }
+  }
+}
+
+.shape-palette {
+  position: absolute;
+  border-color: none;
+  color: var(--foreground);
+  background-color: var(--background);
+  border-radius: 0.25rem;
+  box-shadow: 0px 0px 8px var(--foreground-secondary);
+  .shape-palette-button {
+    border-radius: 0.25rem;
+    &:hover {
+      background-color: var(--foreground-secondary);
     }
   }
 }

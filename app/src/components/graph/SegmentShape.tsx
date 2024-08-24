@@ -2,7 +2,7 @@ import { affineApply } from "../../libs/affine";
 import { getPositionForTerminus, isFullyFree } from "../../libs/segment";
 import { wrapForTouchGeneric } from "../../libs/touch";
 import { useDisplay } from "../../stores/display";
-import { CausalGraph, GraphSegment, Vector } from "../../types";
+import { CausalGraph, getLineWidth, GraphSegment, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps } from "../../types/components";
 import { DraggableMatter, Reshaper } from "../../views/GraphView/types";
 import { ReshaperHandleCorner } from "./ReshapeHandle";
@@ -52,7 +52,7 @@ export const SvgSegmentSelectedShape: ComponentWithProps<{ shape: GraphSegment; 
   </>;
 };
 
-export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props) => {
+export const SegmentShapeElement: ComponentWithProps<ShapeProps<GraphSegment>> = (props) => {
   const {
     shape,
     graph,
@@ -61,7 +61,7 @@ export const SegmentShape: ComponentWithProps<ShapeProps<GraphSegment>> = (props
 
   const centers = getPositionForTerminus(shape, graph);
 
-  const lineWidth = shape.shape.line.lineWidth;
+  const lineWidth = getLineWidth(shape.shape)
   const margin = lineWidth + 20;
   const draggableMatter: DraggableMatter = { target: "segment", shapeId: shape.id, shape, }
   return <g>

@@ -37,7 +37,7 @@ export const ScaleView: ComponentWithProps<{ getCenter: () => Vector }> = ({
     });
   };
 
-  return <div className="basic-palette-subpanel grid grid-flow-col grid-rows-1 items-center">
+  return <div className="canvas-palette-subpanel grid grid-flow-col grid-rows-1 items-center">
     <Button className="ce-button rounded text-lg" onClick={() => {
       animate(display.magnitude, display.magnitude - 0.25);
     }}>

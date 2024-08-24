@@ -17,8 +17,53 @@ export type Size = {
   height: number;
 };
 
-type AppearanceFields = {
-  labelColor?: ColorValue;
+// ラベル属性
+export type LabelAppearance = {
+	labelFont?: string;
+	labelSize?: number;
+	labelColor?: ColorValue;
+};
+
+// 線のスタイル; 実線, 点線, 波線
+type LineStyle = "continuous" | "dotted" | "dashed";
+
+// 線の属性
+export type LineAppearance = {
+	lineWidth?: number;
+	lineColor?: ColorValue;
+	lineStyle?: LineStyle;
+};
+
+const defaultLineWidth = 2;
+export const defaultLineStyle: LineStyle = "continuous";
+export function getLineWidth(shape: LineAppearance) {
+  return shape.lineWidth ?? defaultLineWidth;
+}
+
+// 長方形様形状の属性
+export type RectangleLikeAppearance = {
+	size: Size;
+};
+
+export type FillableAppearance = {
+  fillColor?: ColorValue;
+  fillOpacity?: number;
+};
+
+// 端点のスタイル
+export type TerminusStyle = "arrow-head" | "circle";
+
+// 端点の属性
+export type TerminusAppearance = {
+	terminusStyle?: TerminusStyle;
+};
+
+// 線分のスタイル; 直線, 折れ線, 曲線
+export type SegmentStyle = "straight" | "zigzag" | "curve";
+
+// 線分の属性
+export type SegmentAppearance = {
+	segmentStyle?: SegmentStyle;
 };
 
 type GenericFields = {
@@ -26,24 +71,19 @@ type GenericFields = {
   label: string | null;
 };
 
-/**
- * 一般的な線の形状情報
- */
-export type LineAppearance = {
-  lineWidth: number;
-};
-
 type NodeShapeType = "Rectangle" | "Circle";
 type ShapeType = NodeShapeType | "Segment";
 export type ShapeId = number;
 
 
-export type GraphShape = GenericFields & AppearanceFields & {
+export type GraphShape = GenericFields
+  & LabelAppearance
+  & {
   shapeType: ShapeType;
   z: number;
 };
 
-export type GraphNode = GraphShape & {
+export type GraphNode = GraphShape & FillableAppearance & {
   shapeType: NodeShapeType;
   position: Vector;
   size: Size;
@@ -65,9 +105,11 @@ export function isGraphSegment(shape: GraphShape): shape is GraphSegment {
   return shape.shapeType === "Segment";
 }
 
-type RectangleLikeShape = {
-  line: LineAppearance;
-};
+export function isShapeFillable(shape: unknown): shape is FillableAppearance {
+  return "fillColor" in (shape as any);
+}
+
+type RectangleLikeShape = LineAppearance;
 
 type RectangleShape = RectangleLikeShape;
 type CircleShape = RectangleLikeShape;
@@ -97,9 +139,12 @@ export type GraphSegment = GraphShape & {
   shapeType: "Segment";
   starting: SegmentBond;
   ending: SegmentBond;
-  shape: {
-    line: LineAppearance;
-  };
+  shape: LineAppearance
+    & SegmentAppearance
+    & {
+      staring?: TerminusAppearance;
+      ending?: TerminusAppearance;
+    };
   z: number;
 };
 

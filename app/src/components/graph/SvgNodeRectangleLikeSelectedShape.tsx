@@ -1,6 +1,6 @@
 import { affineApply } from "../../libs/affine";
 import { useDisplay } from "../../stores/display";
-import { RectangleLikeNode, Vector } from "../../types";
+import { getLineWidth, RectangleLikeNode, Vector } from "../../types";
 import { ComponentWithProps, DraggableProps, LinkingProps } from "../../types/components";
 import { Linker, Reshaper } from "../../views/GraphView/types";
 import { ReshaperHandleCorner, ReshapeHandleSide, LinkHandle } from "./ReshapeHandle";
@@ -75,7 +75,8 @@ export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<
     affineFieldToTag,
   } = useDisplay();
 
-  const boxMargin = (shape.shape.line.lineWidth + 1) * scale / 2;
+  const lineWidth = getLineWidth(shape.shape);
+  const boxMargin = (lineWidth + 1) * scale / 2;
 
   const x0 = shape.position.x;
   const y0 = shape.position.y;

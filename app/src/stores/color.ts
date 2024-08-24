@@ -24,7 +24,7 @@ const deaultColorPalette: () => ColorPalette = () => ({
     "blue",
     "cyan",
   ],
-});
+} as ColorPalette);
 
 const colorPaletteAtom = atom<ColorPalette>(deaultColorPalette());
 

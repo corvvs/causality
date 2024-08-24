@@ -10,12 +10,13 @@ import { SelectedLayer } from "./GraphView/SelectedLayer";
 import { NodeEditView } from "./GraphView/NodeEditView";
 // import { SystemView } from "./GraphView/SystemView";
 import { useModifierKey } from "../stores/modifier_keys";
-import { BasicPalette } from "../components/palette/BasicPalette";
+import { CanvasPalette } from "../components/palette/CanvasPalette";
 import { getPositionForTerminus, isFullyFree } from "../libs/segment";
 import { reshapeRectangleLikeNode, reshapeSegment } from "./GraphView/reshaping";
 import { affineApply } from "../libs/affine";
 import { useKeyDown } from "../hooks/keyEvent";
 import { MouseEventLike, wrapForTouch } from "../libs/touch";
+import { ShapePalette } from "../components/palette/ShapePalette";
 
 
 
@@ -206,7 +207,7 @@ export const GraphView = () => {
     onPinchZoom: (e) => {
       if (!svgRef.current) { return; }
       const center: Vector = { x: e.clientX, y: e.clientY };
-      const deltaMag = e.deltaY > 0 ? -0.009 : 0.008;
+      const deltaMag = e.deltaY > 0 ? -0.016 : 0.012;
       changeScale(display.magnitude + deltaMag, center);
     },
     onPinchScroll: (e) => {
@@ -246,6 +247,8 @@ export const GraphView = () => {
       }
     }
   }} />
+
+  const isSelectedSome = Object.keys(selectedNodes.ids).length === 1;
 
   return <div className="h-screen w-screen flex flex-col" style={style}>
     <div className="h-full w-full">
@@ -426,20 +429,40 @@ export const GraphView = () => {
 
 
 
-    <BasicPalette getCenter={() => {
-      if (!svgRef.current) { return { x: 0, y: 0 }; }
-      const svgRect = svgRef.current.getClientRects()[0];
-      const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
-      return center;
-    }} />
+    <CanvasPalette
+      getCenter={() => {
+        if (!svgRef.current) { return { x: 0, y: 0 }; }
+        const svgRect = svgRef.current.getClientRects()[0];
+        const center: Vector = { x: svgRect.width / 2, y: svgRect.height / 2 };
+        return center;
+      }}
+    />
 
-    {Object.keys(selectedNodes.ids).length === 1 && <div className="absolute right-0 top-0 p-4"
+    {isSelectedSome && <div className="absolute right-0 top-0 p-4"
       onMouseDown={(e) => { e.stopPropagation(); }}
     >
       <NodeEditView
         selectedNodes={selectedNodes}
       />
     </div>}
+
+    {isSelectedSome && <ShapePalette
+      shape={getShape(selectedNodes.ids[0])}
+      getViewPort={() => {
+        if (!svgRef.current) { return { r0: { x: 0, y: 0 }, r1: { x: 0, y: 0 } }; }
+        const rect = svgRef.current.getClientRects()[0];
+        return {
+          r0: {
+            x: 0,
+            y: 0,
+          },
+          r1: {
+            x: rect.width,
+            y: rect.height,
+          },
+        };
+      }}
+    />}
 
 
     {/* <div className="absolute left-0 bottom-0 p-4"

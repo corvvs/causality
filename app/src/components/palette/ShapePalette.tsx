@@ -1,4 +1,4 @@
-import { CausalGraph, ColorValue, getLineWidth, GraphNode, GraphShape, hasLabel, hasLine, hasSegmentStyle, isCircleNode, isGraphSegment, isRectangleNode, LineAppearance, Rectangle } from "../../types";
+import { CausalGraph, ColorValue, getLineWidth, GraphNode, GraphSegment, GraphShape, hasLabel, hasLine, isCircleNode, isGraphSegment, isRectangleNode, LineAppearance, Rectangle, SegmentStyles } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 import { InlineIcon } from "../InlineIcon";
 import { LiaGripLinesVerticalSolid } from "react-icons/lia";
@@ -10,6 +10,9 @@ import { Button, Popover, PopoverButton, PopoverPanel } from "@headlessui/react"
 import { ColorPicker } from "../ColorPicker";
 import { FaA } from "react-icons/fa6";
 import { TiDocumentText } from "react-icons/ti";
+import { MdTurnSharpLeft } from "react-icons/md";
+import { IoIosArrowRoundUp } from "react-icons/io";
+import { MultipleButtons } from "../MultipleButtons";
 
 
 
@@ -133,6 +136,56 @@ const LineSubPalette: ComponentWithProps<{
   </Popover>
 };
 
+const SegmentStyleIconMap = {
+  "straight": IoIosArrowRoundUp,
+  "zigzag": MdTurnSharpLeft,
+};
+
+/**
+ * セグメント自体の見た目をいじるパレット
+ */
+const SegmentSubPalette: ComponentWithProps<{
+  shape: GraphSegment;
+}> = (props) => {
+  const {
+    shape,
+  } = props;
+
+  const SegmentStyleIcon = SegmentStyleIconMap[shape.segmentStyle ?? "straight"];
+
+  const {
+    updateNodeDirectly,
+  } = useGraph();
+  return <Popover className="relative">
+    <PopoverButton as="div">
+      <Button className="canvas-palette-button p-1">
+        <InlineIcon i={<SegmentStyleIcon className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="bottom start" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      <MultipleButtons
+        items={SegmentStyles.map((style) => {
+          const SegmentStyleIcon = SegmentStyleIconMap[style];
+
+          return {
+            key: style,
+            content: <div
+              className="h-[1.5rem]"
+            >
+              <InlineIcon i={<SegmentStyleIcon />} />
+            </div>
+          };
+        })}
+        onClick={(item) => {
+          updateNodeDirectly(shape.id, {
+            segmentStyle: item.key,
+          } as unknown as GraphNode);
+        }}
+      />
+    </PopoverPanel>
+  </Popover>
+};
+
 /**
  * シェイプパレットコンポーネント
  * 
@@ -217,9 +270,9 @@ export const ShapePalette: ComponentWithProps<{
         <LineSubPalette shape={shape} />
       </div>}
 
-      {hasSegmentStyle(shape) && <div title="SegmentStyle"
+      {isGraphSegment(shape) && <div title="SegmentStyle"
       >
-        <InlineIcon i={<LiaGripLinesVerticalSolid className="w-6 h-6" />} />
+        <SegmentSubPalette shape={shape} />
       </div>}
 
 

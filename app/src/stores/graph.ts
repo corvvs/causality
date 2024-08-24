@@ -7,7 +7,7 @@ import { useState } from "react";
 const graphKey = "GRAPH";
 const graphProvider = localStorageProvider<CausalGraphVersioned>(graphKey);
 
-const currentGraphVersion = "0.0.2";
+const currentGraphVersion = "0.0.3";
 function loadGraph() {
   const g = graphProvider.load();
   if (g && g.version === currentGraphVersion) {

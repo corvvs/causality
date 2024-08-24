@@ -61,7 +61,8 @@ export type TerminusAppearance = {
 };
 
 // 線分のスタイル; 直線, 折れ線, 曲線
-export type SegmentStyle = "straight" | "zigzag" | "curve";
+export const SegmentStyles = ["straight", "zigzag"] as const;
+export type SegmentStyle = typeof SegmentStyles[number];
 
 // 線分の属性
 export type SegmentAppearance = {

@@ -67,7 +67,7 @@ const ActualSegment: ComponentWithProps<{
   } = props;
 
   const additionalProps = draggableMatter ? {
-    className: "hit-target",
+    className: "causality hit-target",
     onClick: (e: React.MouseEvent<SVGLineElement>) => {
       if (!clickForSelection) { return; }
       clickForSelection(e, shape);
@@ -84,7 +84,9 @@ const ActualSegment: ComponentWithProps<{
       wrapForTouchGeneric((e) => mouseDownForDragging(e, draggableMatter))(e);
       e.stopPropagation();
     }
-  } : {};
+  } : {
+    className: "causality pointer-events-none",
+  };
 
   switch (getSegmentStyle(shape)) {
     case "curve": {
@@ -96,7 +98,7 @@ const ActualSegment: ComponentWithProps<{
       const by = centers.ending.position.y + centers.ending.direction.y;
       const ex = centers.ending.position.x;
       const ey = centers.ending.position.y;
-      return <path className="causality"
+      return <path
         d={`M ${sx} ${sy} C ${ax} ${ay} ${bx} ${by} ${ex} ${ey}`}
         strokeWidth={strokeWidth}
         fill="transparent"
@@ -104,7 +106,7 @@ const ActualSegment: ComponentWithProps<{
       />
     }
     default: {
-      return <line className="causality"
+      return <line
         x1={centers.starting.position.x}
         y1={centers.starting.position.y}
         x2={centers.ending.position.x}

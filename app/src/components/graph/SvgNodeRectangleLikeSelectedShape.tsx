@@ -75,7 +75,7 @@ export const SvgNodeRectangleLikeSelectedShape: ComponentWithProps<
     affineFieldToTag,
   } = useDisplay();
 
-  const lineWidth = getLineWidth(shape.shape);
+  const lineWidth = getLineWidth(shape);
   const boxMargin = (lineWidth + 1) * scale / 2;
 
   const x0 = shape.position.x;

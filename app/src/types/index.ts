@@ -19,6 +19,7 @@ export type Size = {
 
 // ラベル属性
 export type LabelAppearance = {
+  id: ShapeId;
 	labelFont?: string;
 	labelSize?: number;
 	labelColor?: ColorValue;
@@ -29,6 +30,7 @@ type LineStyle = "continuous" | "dotted" | "dashed";
 
 // 線の属性
 export type LineAppearance = {
+  id: ShapeId;
 	lineWidth?: number;
 	lineColor?: ColorValue;
 	lineStyle?: LineStyle;
@@ -105,8 +107,21 @@ export function isGraphSegment(shape: GraphShape): shape is GraphSegment {
   return shape.shapeType === "Segment";
 }
 
-export function isShapeFillable(shape: unknown): shape is FillableAppearance {
-  return "fillColor" in (shape as any);
+export function isShapeFillable(shape: GraphShape) {
+  return isCircleNode(shape) || isRectangleNode(shape);
+}
+
+export function hasLine(shape: unknown): shape is LineAppearance {
+  const s = shape as GraphShape;
+  return isCircleNode(s) || isRectangleNode(s) || isGraphSegment(s);
+}
+
+export function hasLabel(shape: GraphShape) {
+  return isCircleNode(shape) || isRectangleNode(shape);
+}
+
+export function hasSegmentStyle(shape: GraphShape) {
+  return isGraphSegment(shape);
 }
 
 type RectangleLikeShape = LineAppearance;
@@ -114,18 +129,14 @@ type RectangleLikeShape = LineAppearance;
 type RectangleShape = RectangleLikeShape;
 type CircleShape = RectangleLikeShape;
 
-export type RectangleLikeNode = GraphNode & {
-  shape: RectangleLikeShape;
-}
+export type RectangleLikeNode = GraphNode & RectangleLikeShape;
 
-export type RectangleNode = GraphNode & {
+export type RectangleNode = GraphNode & RectangleShape &{
   shapeType: "Rectangle";
-  shape: RectangleShape;
 };
 
-export type CircleNode = GraphNode & {
+export type CircleNode = GraphNode & CircleShape & {
   shapeType: "Circle";
-  shape: CircleShape;
 };
 
 /**
@@ -135,16 +146,14 @@ export type CircleNode = GraphNode & {
  */
 export type SegmentBond = ShapeId | Vector;
 
-export type GraphSegment = GraphShape & {
+export type GraphSegment = GraphShape & LineAppearance & SegmentAppearance & {
   shapeType: "Segment";
   starting: SegmentBond;
   ending: SegmentBond;
-  shape: LineAppearance
-    & SegmentAppearance
-    & {
-      staring?: TerminusAppearance;
-      ending?: TerminusAppearance;
-    };
+  shape: {
+    staring?: TerminusAppearance;
+    ending?: TerminusAppearance;
+  };
   z: number;
 };
 

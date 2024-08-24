@@ -1,4 +1,4 @@
-import { CausalGraph, ColorValue, GraphShape, isCircleNode, isGraphSegment, isRectangleNode, Rectangle } from "../../types";
+import { CausalGraph, ColorValue, getLineWidth, GraphNode, GraphShape, hasLabel, hasLine, hasSegmentStyle, isCircleNode, isGraphSegment, isRectangleNode, LineAppearance, Rectangle } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 import { InlineIcon } from "../InlineIcon";
 import { LiaGripLinesVerticalSolid } from "react-icons/lia";
@@ -103,6 +103,36 @@ const TextColorSubPalette: ComponentWithProps<{
   </Popover>
 };
 
+const LineSubPalette: ComponentWithProps<{
+  shape: LineAppearance;
+}> = (props) => {
+  const {
+    shape,
+  } = props;
+
+
+  const {
+    updateNodeDirectly,
+  } = useGraph();
+  return <Popover className="relative">
+    <PopoverButton as="div">
+      <Button className="canvas-palette-button p-1">
+        <InlineIcon i={<LiaGripLinesVerticalSolid className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="bottom start" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      <div className="edit-box grid grid-rows-1 grid-flow-col gap-2">
+        <label>Line Width</label>
+        <input type="range" min={0.5} max={30} value={getLineWidth(shape)} onChange={(e) => {
+          updateNodeDirectly(shape.id, {
+            lineWidth: parseFloat(e.target.value),
+          } as unknown as GraphNode);
+        }} />
+      </div>
+    </PopoverPanel>
+  </Popover>
+};
+
 /**
  * シェイプパレットコンポーネント
  * 
@@ -142,6 +172,9 @@ export const ShapePalette: ComponentWithProps<{
       return { bottom: viewPortTag.r1.y - boudingBoxTag.r0.y + paletteYMargin };
     }
     if (boudingBoxTag.r1.y + paletteHeight <= viewPortTag.r1.y) {
+      if (paletteYMargin > boudingBoxTag.r1.y + paletteHeight) {
+        return null;
+      }
       return { top: boudingBoxTag.r1.y + paletteYMargin };
     }
     return { top: viewPortTag.r0.y + paletteYMargin };
@@ -152,6 +185,7 @@ export const ShapePalette: ComponentWithProps<{
     transform: "translateX(-50%)",
   };
 
+  if (!paletteY) { return null; }
 
   return <div
     className="shape-palette"
@@ -165,23 +199,28 @@ export const ShapePalette: ComponentWithProps<{
   >
     <div className="grid grid-rows-1 grid-flow-col gap-2 p-1">
 
-      <div title="Label"
+      {hasLabel(shape) && <div title="Label"
       >
         <TextInputSubPalette shape={shape} />
-      </div>
+      </div>}
 
-      <div title="Label"
+      {hasLabel(shape) && <div title="Label"
         style={{
           color: shape.labelColor,
         }}
       >
         <TextColorSubPalette shape={shape} />
-      </div>
+      </div>}
 
-      <div title="Line"
+      {hasLine(shape) && <div title="Line"
+      >
+        <LineSubPalette shape={shape} />
+      </div>}
+
+      {hasSegmentStyle(shape) && <div title="SegmentStyle"
       >
         <InlineIcon i={<LiaGripLinesVerticalSolid className="w-6 h-6" />} />
-      </div>
+      </div>}
 
 
     </div>

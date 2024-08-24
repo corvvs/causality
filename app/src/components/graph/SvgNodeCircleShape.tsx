@@ -24,7 +24,7 @@ export const SvgNodeCircleShape: ComponentWithProps<ShapeProps<CircleNode>> = (p
       rx={shape.size.width / 2}
       ry={shape.size.height / 2}
       fill="transparent"
-      strokeWidth={getLineWidth(shape.shape)}
+      strokeWidth={getLineWidth(shape)}
       onClick={(e) => {
         if (!props.clickForSelection) { return; }
         props.clickForSelection(e, shape);

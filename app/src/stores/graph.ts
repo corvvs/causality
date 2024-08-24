@@ -34,8 +34,6 @@ function newRectNode(index: number, position: Vector): RectangleNode {
       width: 100,
       height: 100,
     },
-    shape: {
-    },
   }
 }
 
@@ -49,8 +47,6 @@ function newCircleNode(index: number, position: Vector): CircleNode {
     size: {
       width: 100,
       height: 100,
-    },
-    shape: {
     },
   }
 }

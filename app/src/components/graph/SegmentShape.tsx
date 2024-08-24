@@ -61,7 +61,7 @@ export const SegmentShapeElement: ComponentWithProps<ShapeProps<GraphSegment>> =
 
   const centers = getPositionForTerminus(shape, graph);
 
-  const lineWidth = getLineWidth(shape.shape)
+  const lineWidth = getLineWidth(shape)
   const margin = lineWidth + 20;
   const draggableMatter: DraggableMatter = { target: "segment", shapeId: shape.id, shape, }
   return <g>

@@ -24,7 +24,7 @@ export const SvgNodeRectangleShape: ComponentWithProps<ShapeProps<RectangleNode>
       width={shape.size.width}
       height={shape.size.height}
       fill="transparent"
-      strokeWidth={getLineWidth(shape.shape)}
+      strokeWidth={getLineWidth(shape)}
       onClick={(e) => {
         if (!props.clickForSelection) { return; }
         props.clickForSelection(e, shape);

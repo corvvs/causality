@@ -1,12 +1,15 @@
-import { CausalGraph, GraphShape, isCircleNode, isGraphSegment, isRectangleNode, Rectangle } from "../../types";
+import { CausalGraph, ColorValue, GraphShape, isCircleNode, isGraphSegment, isRectangleNode, Rectangle } from "../../types";
 import { ComponentWithProps } from "../../types/components";
 import { InlineIcon } from "../InlineIcon";
-import { TiDocumentText } from "react-icons/ti";
 import { LiaGripLinesVerticalSolid } from "react-icons/lia";
 import { useDisplay } from "../../stores/display";
 import { affineApply, AffineMatrix } from "../../libs/affine";
 import { getPositionForTerminus } from "../../libs/segment";
 import { useGraph } from "../../stores/graph";
+import { Button, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import { ColorPicker } from "../ColorPicker";
+import { FaA } from "react-icons/fa6";
+import { TiDocumentText } from "react-icons/ti";
 
 
 
@@ -34,6 +37,71 @@ function getBoundingBoxForShape(shape: GraphShape, graph: CausalGraph, affineFie
   return { r0: { x: 0, y: 0 }, r1: { x: 0, y: 0 } };
 }
 
+const TextInputSubPalette: ComponentWithProps<{
+  shape: GraphShape;
+}> = (props) => {
+  const {
+    shape,
+  } = props;
+
+  const {
+    updateNodeDirectly,
+  } = useGraph();
+
+  return <Popover className="relative"
+    onKeyDown={(e) => {
+      e.stopPropagation();
+    }}
+  >
+    <PopoverButton as="div">
+      <Button className="canvas-palette-button p-1">
+        <InlineIcon i={<TiDocumentText className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="bottom start" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      <div className="edit-box">
+        <input
+          type="text"
+          value={shape.label || ""}
+          onChange={(e) => {
+            updateNodeDirectly(shape.id, {
+              label: e.target.value
+            });
+          }}
+        />
+      </div>
+    </PopoverPanel>
+  </Popover>
+};
+
+const TextColorSubPalette: ComponentWithProps<{
+  shape: GraphShape;
+}> = (props) => {
+  const {
+    shape,
+  } = props;
+
+  const {
+    updateNodeDirectly,
+  } = useGraph();
+  return <Popover className="relative">
+    <PopoverButton as="div">
+      <Button className="canvas-palette-button p-1">
+        <InlineIcon i={<FaA className="w-6 h-6" />} />
+      </Button>
+    </PopoverButton>
+    <PopoverPanel anchor="bottom start" transition className="flex flex-col transition duration-200 ease-out data-[closed]:-translate-x-1 data-[closed]:opacity-0">
+      {({ close }) => (
+        <ColorPicker currentColor={shape.labelColor ?? null} setColor={(v: ColorValue | null) => {
+          updateNodeDirectly(shape.id, {
+            labelColor: v ?? undefined,
+          });
+          close();
+        }} />
+      )}
+    </PopoverPanel>
+  </Popover>
+};
 
 /**
  * シェイプパレットコンポーネント
@@ -78,15 +146,18 @@ export const ShapePalette: ComponentWithProps<{
     }
     return { top: viewPortTag.r0.y + paletteYMargin };
   })();
-  const paletteX = Math.min(Math.max(viewPortTag.r0.x, (boudingBoxTag.r0.x + boudingBoxTag.r1.x) / 2), viewPortTag.r1.x);
+  // 横位置の決定(適当)
+  const paletteX = {
+    left: Math.min(Math.max(viewPortTag.r0.x, (boudingBoxTag.r0.x + boudingBoxTag.r1.x) / 2), viewPortTag.r1.x),
+    transform: "translateX(-50%)",
+  };
 
 
   return <div
     className="shape-palette"
     style={{
-      left: paletteX,
+      ...paletteX,
       ...paletteY,
-      transform: "translateX(-50%)",
     }}
     onMouseUp={(e) => {
       e.stopPropagation();
@@ -95,11 +166,16 @@ export const ShapePalette: ComponentWithProps<{
     <div className="grid grid-rows-1 grid-flow-col gap-2 p-1">
 
       <div title="Label"
+      >
+        <TextInputSubPalette shape={shape} />
+      </div>
+
+      <div title="Label"
         style={{
           color: shape.labelColor,
         }}
       >
-        <InlineIcon i={<TiDocumentText className="w-6 h-6" />} />
+        <TextColorSubPalette shape={shape} />
       </div>
 
       <div title="Line"

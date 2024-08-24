@@ -7,7 +7,6 @@ import { NodeGroup } from "./GraphView/components";
 import { GridOverlay } from "./GraphView/GridOverlay";
 import { DraggableMatter, DraggingInfo, NodeSelection } from "./GraphView/types";
 import { SelectedLayer } from "./GraphView/SelectedLayer";
-import { NodeEditView } from "./GraphView/NodeEditView";
 // import { SystemView } from "./GraphView/SystemView";
 import { useModifierKey } from "../stores/modifier_keys";
 import { CanvasPalette } from "../components/palette/CanvasPalette";
@@ -437,14 +436,6 @@ export const GraphView = () => {
         return center;
       }}
     />
-
-    {isSelectedSome && <div className="absolute right-0 top-0 p-4"
-      onMouseDown={(e) => { e.stopPropagation(); }}
-    >
-      <NodeEditView
-        selectedNodes={selectedNodes}
-      />
-    </div>}
 
     {isSelectedSome && <ShapePalette
       shape={getShape(selectedNodes.ids[0])}

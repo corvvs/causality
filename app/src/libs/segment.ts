@@ -27,8 +27,8 @@ function getActualPositionForNominalCircle(r0: Vector, r1: Vector, shape0: Circl
 for (let i = 0; i < 4; i++) {
     const phi = Math.PI / 2 * i;
     const d = { x: w * Math.cos(phi), y: h * Math.sin(phi) };
-    const x = shape0.position.x + w / 2 + d.x;
-    const y = shape0.position.y + h / 2 + d.y;
+    const x = shape0.position.x + w + d.x;
+    const y = shape0.position.y + h + d.y;
     const v = vectorSub(r1, { x, y });
     const vv = vectorDot(v, v);
     if (vv < maxD) {
